@@ -68,7 +68,7 @@ class BoardroomBooker{
 
 		/*Main or target page*/
 		$controller = new CommandController($this);
-		if(!$controller->$method_name()){$controller->index();};
+		if(!$controller->$method_name()){$controller->main();};
 
 		if(!$this->page){$this->page = 'mainPage';}
 	}
@@ -108,5 +108,8 @@ class BoardroomBooker{
 	}
 	public static function getConfig(){
 		return self::$config;
+	}
+	public function setPage($page){
+		$this->page=$page;
 	}
 }

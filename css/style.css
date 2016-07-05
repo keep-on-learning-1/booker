@@ -1,3 +1,6 @@
+body{
+    background: #A3BF9B;
+}
 /*Default form*/
 .default_form_container,
 .form_page_header{
@@ -37,6 +40,187 @@
     margin: 10px;
 }
 .msg-error{
-    color: red;
-    border-color: red !important;
+    color: #C43328;
+    border-color: #C43328 !important;
+}
+/* site top section */
+/* -- header*/
+#main_page_header{
+    text-align: center;
+    background: #CCFFCC;
+    padding: 5px;
+}
+#main_page_header ul{
+    display: inline-block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#main_page_header li{
+    display: inline-block;
+    font: 20px/25px "Times New Roman", Serif;
+    padding: 0px 10px;
+    border-right: 1px solid #551A8B;
+}
+#main_page_header li:last-child{
+    border: none;
+}
+#main_page_header a{
+    text-decoration: none;
+}
+#main_page_header a,
+#main_page_header a:visited{
+    color: #551A8B;
+}
+/* --Site 'logo' and page name*/
+.main_page_title{
+    background-color: #339966;
+    display: inline-block;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+}
+.booker_title{
+    display: inline-block;
+    font-size: 20px;
+    padding:  15px;
+    border: 1px solid black;
+    margin-left: 15px;
+}
+/*Main page*/
+/* -- CalendarController*/
+.CalendarControl_button-left,
+.CalendarControl_button-right,
+.CalendarControl_month-caption{
+    display: inline-block;
+    border: 1px solid black;
+    padding: 5px 10px;
+    background: #fff;
+}
+.CalendarControl_month-caption{
+    width: 120px;
+    text-align: center;
+    margin: 0 3px;
+}
+.CalendarControl_button-left,
+.CalendarControl_button-right{
+    cursor: pointer;
+}
+.CalendarControl_controller-container{
+    border: 1px solid black;
+    padding: 15px;
+    background: #CFC;
+    display: inline-block;
+}
+/* --Calendar*/
+#bb_calendar{
+    border: 1px solid black;
+    border-collapse: collapse;
+    background-color: #fff;
+    float: left;
+}
+#bb_calendar thead td{
+    /*height: 40px;
+    line-height: 40px;*/
+    font-weight: bold;
+    font-family: sans-serif;
+}
+#bb_calendar thead tr{
+    text-align: center;
+}
+
+#bb_calendar tbody tr{
+    height: 50px;
+}
+#bb_calendar td{
+    border: 2px solid black;
+    width: 100px;
+    position: relative;
+}
+.bb_calendar_date{
+    display: inline-block;
+    text-align: right;
+    /*border: 1px solid red;*/
+    position: absolute;
+    width: 18px;
+    right: 3px;
+    top: 3px;
+}
+#main_buttons_container{
+
+}
+/*Employees list page*/
+#employee_container{
+    text-align: center;
+    background-color: #fff;
+    padding: 10px;
+}
+#employee_container table{
+    display: inline-block;
+    text-align: left;
+}
+
+#employee_container td{
+    padding: 5px;
+    width: 120px;
+}
+#add_employee_button{
+    display: inline-block;
+    padding: 10px;
+    background-color: #ccc;
+    text-decoration: none;
+    color: black;
+    font: 18px "Times New Roman", Serif;
+}
+#add_employee_button:visited{
+    color: black;
+}
+/*Add employee page*/
+#add_employee_container{
+    background-color: white;
+    padding: 20px;
+
+}
+#add_employee_container ul{
+    /*list-style: none;*/
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    list-style-position: inside;
+}
+#add_employee_container li{
+    display: inline-block;
+    width: 220px;
+    margin: 30px;
+}
+#add_employee_container .number{
+    display: inline-block;
+    float: left;
+    margin-right: 5px;
+}
+#add_employee_container .inner_content{
+    display: inline-block;
+    width: 200px;
+}
+#add_employee_container input[type='text']{
+    width: 200px;
+    margin-top: 20px;
+}
+/*Controls*/
+.bb_button{
+    display: inline-block;
+    background-color: #CCFFCC;
+    text-align: center;
+    width: 120px;
+    padding: 5px;
+    font: 18px "Times New Roman", Serif;
+    margin-left: 20px;
+    margin-top: 10px;
+    text-decoration: none;
+
+}
+.bb_button:visited,
+.bb_button:active,
+.bb_button{
+    color: #551A8B;
 }

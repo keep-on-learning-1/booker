@@ -1,6 +1,8 @@
 <?php
 class PagePattern{
-    function getHeader($title = '', $css_files = array(), $js_files = array()){
+    function __construct(){}
+
+    public function getHeader($title = '', $css_files = array(), $js_files = array()){
         if($css_files && !is_array($css_files)){
             $css_files = array($css_files);
         }
@@ -23,7 +25,7 @@ class PagePattern{
                 <?php endforeach; ?>
 
                 <?php foreach($js_files as $js_file): ?>
-                    <?php if(file_exists('./css/'.$js_file)): ?>
+                    <?php if(file_exists('./js/'.$js_file)): ?>
 
                         <script src="/js/<?php echo $js_file; ?>"></script>
 
@@ -34,13 +36,14 @@ class PagePattern{
             <body>
 <?php
     }
-    function getFooter($js_files = array()){
+    public function getFooter($js_files = array()){
         if($js_files && !is_array($js_files)){
+            dd($js_files);
             $js_files = array($js_files);
         }
 ?>
             <?php foreach($js_files as $js_file): ?>
-                <?php if(file_exists('./css/'.$js_file)): ?>
+                <?php if(file_exists('./js/'.$js_file)): ?>
 
                 <script src="/js/<?php echo $js_file; ?>"></script>
 
@@ -51,15 +54,30 @@ class PagePattern{
         </html>
 <?php
     }
-    function renderAppMessages(){
+    public function renderAppMessages(){
         $messages = BoardroomBooker::getMessages();
         if(isset($messages) && is_array($messages)){
             $msg_html[] = '<div id="app_messages_container">';
             foreach($messages as $msg){
-                $msg_html[] = "<div class=\"app_message {$msg['class']}\">{$msg['text']}</div>";
+                $msg_html[] = "<div class=\"app_message {$msg['class']}\">{$msg['text']}</div><br>";
             }
             $msg_html[] = '</div>';
          }
         return implode("\r\n", $msg_html);
+    }
+
+    public function renderTopSection($curr_page = ''){
+        $config = BoardroomBooker::getConfig();
+
+        $html[] = '<div id="main_page_header">';
+        $html[] = '<ul>';
+        for($i=1; $i<=$config['booker']['number_of_bookers'];$i++){
+            $html[] = '<li><a href="index.php?action=main&booker='.$i.'">Boardroom '.$i.'</a></li>';
+        }
+        $html[] ='</ul>';
+        $html[] ='</div>';
+        $html[] = '<div class="main_page_title">BoardroomBooker</div>';
+        if($curr_page){ $html[] = '<div class="booker_title">'.$curr_page.'</div>';}
+        return implode("\r\n", $html);
     }
 }

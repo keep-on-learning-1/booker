@@ -3,8 +3,8 @@ class SignIn extends PagePattern {
     private $csrf;
     private $messages;
     function __construct(){
-        $this->csrf = sha1(rand(0, PHP_INT_MAX));
-        setcookie('setup_user_csrf', $this->csrf, time()+300);
+       /* $this->csrf = sha1(rand(0, PHP_INT_MAX));
+        setcookie('setup_user_csrf', $this->csrf, time()+300);*/
         $this->messages = BoardroomBooker::getMessages();
     }
     function render(){

@@ -7,7 +7,10 @@ class User{
 
     }
     public static function login($data){
-        if( !$data['login']|| !$data['password']){
+        if(!$data['login'] && !$data['password']){
+            return false;
+        }
+        if( !$data['login'] || !$data['password']){
             BoardroomBooker::setMessage('Empty login or password', 'msg-error');
             return false;
         }
