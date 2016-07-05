@@ -1,10 +1,11 @@
 <?php
 session_start();
 require_once('/classes/booker.php');
+require_once('/classes/user.php');
+require_once('/classes/commandController.php');
 $booker = BoardroomBooker::getInstance();
 $booker->init();
 $booker->invokePage();
-//var_dump($booker);
 
 //TODO: remove helpers
 function dd($i){

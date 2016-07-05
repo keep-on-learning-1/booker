@@ -37,8 +37,9 @@ $dsn = 'mysql:dbname='.$_POST['db_name'].';host='.$_POST['host'];
 try {
     $dbh = new PDO($dsn, $_POST['db_user'], $_POST['db_password']);
 } catch (PDOException $e) {
-    echo 'Подключение не удалось: ' . $e->getMessage();
+    echo 'Connection failed: ' . $e->getMessage();
 }
+/* --users table*/
 $query = "CREATE TABLE IF NOT EXISTS `users` (
                 `id` INT NOT NULL AUTO_INCREMENT,
                 `login` VARCHAR(50) NOT NULL,
@@ -49,5 +50,18 @@ $query = "CREATE TABLE IF NOT EXISTS `users` (
             ENGINE=InnoDB;
             ";
 $dbh ->exec($query);
+
+/* --employees table*/
+$query = "CREATE TABLE IF NOT EXISTS `employees` (
+                `id` INT NOT NULL AUTO_INCREMENT,
+                `name` VARCHAR(50) NOT NULL,
+                `email` VARCHAR(50) NOT NULL,
+                PRIMARY KEY (`id`)
+            )
+            COLLATE='utf8_general_ci'
+            ENGINE=InnoDB;
+            ";
+$dbh ->exec($query);
+
 setcookie('setup_database_csrf', '', time() - 3600);
 header('Location: http://'.$_SERVER['HTTP_HOST']);

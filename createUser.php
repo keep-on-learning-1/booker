@@ -34,7 +34,7 @@ try {
 }
 $query = "INSERT INTO `users` (`login`, `password`) VALUES(:login, :password)";
 $sth = $dbh->prepare($query);
-$sth->execute(array(':login'=>$_POST['login'], ':password'=>md5($_POST['login'])));
+$sth->execute(array(':login'=>$_POST['login'], ':password'=>md5($_POST['password'])));
 $file = array(
     '[booker]',
     'time_format = '.$_POST['time_format'],
