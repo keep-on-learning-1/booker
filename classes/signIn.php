@@ -1,21 +1,27 @@
 <?php
 class SignIn extends PagePattern {
     private $csrf;
+    private $messages;
     function __construct(){
         $this->csrf = sha1(rand(0, PHP_INT_MAX));
         setcookie('setup_user_csrf', $this->csrf, time()+300);
+        $this->messages = BoardroomBooker::getMessages();
     }
     function render(){
-        $this->getHeader('Configuration of BoardroomBooker','setup_user.css')
+        $this->getHeader('Sign In')
         ?>
-        <h1>BoardroomBooker</h1>
-        <div class="default_form_container">
-            <form action="createUser.php" method="POST">
-                <input type="hidden" value="<?php echo $this->csrf; ?>" name="token">
+        <div class="form_page_header">
+            <h1>BoardroomBooker</h1>
+        </div>
 
+        <?php echo $this->renderAppMessages();?>
+
+        <div class="default_form_container">
+            <form id="sign_in_form" action="index.php?action=login" method="POST">
+                <input type="hidden" value="<?php echo $this->csrf; ?>" name="token">
                 <p>
                     <label>Login</label>
-                    <input type="text" value="admin" name="login">
+                    <input type="text" value="" name="login">
                 </p>
                 <p>
                     <label>Password</label>

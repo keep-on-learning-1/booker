@@ -51,4 +51,15 @@ class PagePattern{
         </html>
 <?php
     }
+    function renderAppMessages(){
+        $messages = BoardroomBooker::getMessages();
+        if(isset($messages) && is_array($messages)){
+            $msg_html[] = '<div id="app_messages_container">';
+            foreach($messages as $msg){
+                $msg_html[] = "<div class=\"app_message {$msg['class']}\">{$msg['text']}</div>";
+            }
+            $msg_html[] = '</div>';
+         }
+        return implode("\r\n", $msg_html);
+    }
 }

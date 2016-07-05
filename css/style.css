@@ -1,3 +1,4 @@
+/*Default form*/
 .default_form_container,
 .form_page_header{
     text-align: center;
@@ -21,3 +22,21 @@
 }
 #db_config_form label{width: 105px;}
 #bb_config_form label{width: 125px;}
+#sign_in_form   label{width: 80px;}
+
+/*Displaying messages*/
+#app_messages_container{
+    text-align: center;
+}
+#app_messages_container .app_message{
+    display: inline-block;
+    width: 400px;
+    text-align: left;
+    border: 1px solid black;
+    padding: 15px;
+    margin: 10px;
+}
+.msg-error{
+    color: red;
+    border-color: red !important;
+}

@@ -12,9 +12,11 @@
  */
 class BoardroomBooker{
 	private static $instance;
+	private static $messages;
+	private static $config;
+	private static $db;
 	private $page;
-	private $db;
-	
+
 	private function __construct(){}
 	
 	public static function getInstance(){
@@ -25,42 +27,50 @@ class BoardroomBooker{
 	}
 	
 	public function init(){
+		/*Check configuration*/
 		if(!file_exists('booker.conf')){
 			$this->page = 'setupDatabase';
 			return;
 		}
 		$config = parse_ini_file('booker.conf', 1);
 		if(!$config){throw new Exception('Can\'t read configuration file');}
-		/*Check options*/
+		/* --Check options*/
 		if(	!$config['database']['db_name'] ||
 			!$config['database']['db_host'] ||
 			!$config['database']['db_user'] ||
-			//!$config['database']['db_password'] ||
 			!$config['database']['db_prefix']
 		){
 			/*Did not found one or more options*/
 			$this->page = 'setupDatabase';
 			return;
 		}
-		/*Attempt to connect to database*/
-		$dsn = 'mysql:dbname='.$config['database']['db_name'].';host='.$config['database']['db_host'];
-		try {
-			$this->db = new PDO($dsn, $config['database']['db_user'], $config['database']['db_password']);
-		} catch (PDOException $e) {
-			echo 'Connection failed: ' . $e->getMessage();
+		self::$config = $config;
+		/* --Attempt to connect to database*/
+		$db = self::getDB();
+		if(!$db){
+			$this->page = 'error';
+			return;
 		}
-		$res = $this->db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_ASSOC);
+		$res = $db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_ASSOC);
 		if($res['count'] == 0){
 			$this->page = 'setupBooker';
 			return;
 		}
+
+		parse_str($_SERVER['QUERY_STRING'], $variables);
+		$method_name = ($variables['action'])?$variables['action']:'index';
+
 		/*Authorization*/
-		if(!$_SESSION['user']){
+		if(!$_SESSION['user'] && $method_name != 'login' ){
 			$this->page = 'signIn';
 			return;
 		}
-		die('+');
-		/*Target page from query_string*/
+
+		/*Main or target page*/
+		$controller = new CommandController($this);
+		if(!$controller->$method_name()){$controller->index();};
+
+		if(!$this->page){$this->page = 'mainPage';}
 	}
 
 	public function invokePage(){
@@ -72,5 +82,31 @@ class BoardroomBooker{
 			$page_object = new $class_name();
 			$page_object->render();
 		}
+	}
+
+	public static function setMessage($msg, $class=''){
+		self::$messages[] = array('text'=>$msg, 'class'=>$class);
+	}
+	public static function getMessages(){
+		if(!isset(self::$messages)){
+			return array();
+		}
+		return self::$messages;
+	}
+	public static function getDB(){
+		if(!self::$db){
+			$config =self::getConfig();
+			$dsn = 'mysql:dbname='.$config['database']['db_name'].';host='.$config['database']['db_host'];
+			try {
+				self::$db = new PDO($dsn, $config['database']['db_user'], $config['database']['db_password']);
+			} catch (PDOException $e) {
+				self::setMessage('Connection failed: '.$e->getMessage(), 'msg-error');
+				return false;
+			}
+		}
+		return self::$db;
+	}
+	public static function getConfig(){
+		return self::$config;
 	}
 }
