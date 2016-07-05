@@ -1,0 +1,25 @@
+body{
+    text-align: center;
+}
+
+.tuner_form_container{
+    text-align: center;
+}
+.tuner_form_container form{
+    display: inline-block;
+    border: 1px solid black;
+    padding: 5px 15px ;
+    text-align: left;
+}
+.tuner_form_container label{
+    width: 105px;
+    display: inline-block;
+}
+.form_footer{
+    text-align: center;
+}
+.form_footer input{
+    font-size: 14px ;
+    font-weight: bold;
+    padding: 5px 10px;
+}
