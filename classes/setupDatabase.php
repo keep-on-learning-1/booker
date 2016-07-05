@@ -7,11 +7,13 @@ class SetupDatabase extends PagePattern {
     }
 
     function render(){
-        $this->getHeader('Configuration of database','setup_database.css')
+        $this->getHeader('Configuration of database')
         ?>
-        <h1 id="tuner">Configuration of BoardroomBooker</h1>
-        <div class="tuner_form_container">
-            <form name="bb_tuner" action="config.php" method="POST">
+        <div class="form_page_header">
+            <h1>Configuration of BoardroomBooker</h1>
+        </div>
+        <div class="default_form_container">
+            <form id="db_config_form" action="config.php" method="POST">
                 <input type="hidden" value="<?php echo $this->csrf; ?>" name="token">
                 <h3>
                     Configuration of database
@@ -37,7 +39,7 @@ class SetupDatabase extends PagePattern {
                     <input type="text" value="bb_" name="prefix">
                 </p>
 
-                <p class="form_footer">
+                <p class="default_form_footer">
                     <input type="submit" value="Create">
                 </p>
             </form>

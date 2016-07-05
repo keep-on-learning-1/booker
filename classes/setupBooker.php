@@ -6,17 +6,19 @@ class SetupBooker extends PagePattern {
         setcookie('setup_user_csrf', $this->csrf, time()+300);
     }
     function render(){
-        $this->getHeader('Configuration of BoardroomBooker','setup_user.css')
+        $this->getHeader('Configuration of BoardroomBooker');
         ?>
-        <h1 id="tuner">Configuration of BoardroomBooker</h1>
-        <div class="tuner_form_container">
-            <form name="bb_tuner" action="createUser.php" method="POST">
+        <div class="form_page_header">
+            <h1 id="tuner">Configuration of BoardroomBooker</h1>
+        </div>
+        <div class="default_form_container">
+            <form id="bb_config_form" action="createUser.php" method="POST">
                 <input type="hidden" value="<?php echo $this->csrf; ?>" name="token">
                 <h3>
                     Create master user
                 </h3>
                 <p>
-                    <label>User lodin</label>
+                    <label>User login</label>
                     <input type="text" value="admin" name="login">
                 </p>
                 <p>
@@ -56,7 +58,7 @@ class SetupBooker extends PagePattern {
                     <label>Number</label>
                     <input type="text" value="3" name="number">
                 </p>
-                <p class="form_footer">
+                <p class="default_form_footer">
                     <input type="submit" value="Create">
                 </p>
             </form>

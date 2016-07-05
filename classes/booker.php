@@ -54,10 +54,13 @@ class BoardroomBooker{
 			$this->page = 'setupBooker';
 			return;
 		}
+		/*Authorization*/
+		if(!$_SESSION['user']){
+			$this->page = 'signIn';
+			return;
+		}
 		die('+');
-		/*Проверка авторизации*/
-
-		/*Проверка query_string*/
+		/*Target page from query_string*/
 	}
 
 	public function invokePage(){

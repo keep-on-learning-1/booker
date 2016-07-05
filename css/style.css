@@ -1,0 +1,23 @@
+.default_form_container,
+.form_page_header{
+    text-align: center;
+}
+.default_form_container form{
+    display: inline-block;
+    border: 1px solid black;
+    padding: 5px 15px ;
+    text-align: left;
+}
+.default_form_container label{
+    display: inline-block;
+}
+.default_form_footer{
+    text-align: center;
+}
+.default_form_footer input{
+    font-size: 14px ;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+#db_config_form label{width: 105px;}
+#bb_config_form label{width: 125px;}
