@@ -1,6 +1,9 @@
 <?php
 class PagePattern{
-    function __construct(){}
+    private $data;
+    function __construct($data = null){
+        if($data){$this->data = $data;}
+    }
 
     public function getHeader($title = '', $css_files = array(), $js_files = array()){
         if($css_files && !is_array($css_files)){

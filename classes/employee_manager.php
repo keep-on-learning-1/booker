@@ -1,4 +1,13 @@
 <?php
+/*
+ * Methods:
+ *   - validateEmployeeData
+ *   - getErrors
+ *   - addEmployee
+ *   - editEmployee
+ *   - deleteEmployee
+ *   - getById
+ */
 
 class EmployeeManager{
     private $errors;
@@ -28,19 +37,6 @@ class EmployeeManager{
         if( $this->errors){
             return false;
         }
-
-        $db = BoardroomBooker::getDB();
-        $stmt = $db->prepare('SELECT COUNT(*) as count FROM employees WHERE email=:email');
-        $res = $stmt->execute(array('email' => $data['email']));
-        if(!$res){
-            $this->errors[] = $stmt->errorInfo()[2];
-            return false;
-        }
-        $count = $stmt->fetch(PDO::FETCH_COLUMN);
-        if($count > 0){
-            $this->errors[] = 'Employee with specified e-mail already exists in database.';
-            return false;
-        }
         return true;
     }
 
@@ -54,6 +50,19 @@ class EmployeeManager{
     public function addEmployee($data){
 
         $db = BoardroomBooker::getDB();
+        $stmt = $db->prepare('SELECT COUNT(*) as count FROM employees WHERE email=:email');
+        $res = $stmt->execute(array('email' => $data['email']));
+        if(!$res){
+            $this->errors[] = $stmt->errorInfo()[2];
+            return false;
+        }
+
+        $count = $stmt->fetch(PDO::FETCH_COLUMN);
+        if($count > 0){
+            $this->errors[] = 'Employee with specified e-mail already exists in database.';
+            return false;
+        }
+
         $stmt = $db->prepare("INSERT INTO employees (name, email) VALUES (:name, :email)");
         $res = $stmt->execute(array('name'=>$data['name'], 'email'=>$data['email']));
         if(!$res){
@@ -63,12 +72,53 @@ class EmployeeManager{
         return true;
     }
 
-    public function editEmployee(){
-
+    public function editEmployee($id, $data){
+        if(!$id || !is_numeric($id)){return false;}
+        $db = BoardroomBooker::getDB();
+        $stmt = $db->prepare("UPDATE employees SET name=:name, email=:email WHERE id=:id");
+        $res = $stmt->execute(array('name'=>$data['name'], 'email'=>$data['email'],'id'=>(string)$id));
+        if(!$res){
+            $this->errors[] = $stmt->errorInfo()[2];
+            return false;
+        }
+        return true;
     }
 
     public function deleteEmployee($id){
-        //var_dump($id);
+        if(!$id || !is_numeric($id)){return false;}
 
+        $employee = $this->getById($id);
+        if(!$employee){
+            //$this->errors[] = 'Employee with specified id does not exist.';
+            return false;
+        }
+
+        $db = BoardroomBooker::getDB();
+        $stmt = $db->prepare("DELETE FROM employees WHERE id=:id");
+        $res = $stmt->execute(array('id'=>$id));
+        if(!$res){
+            $this->errors[] = $stmt->errorInfo()[2];
+            return false;
+        }
+        return $employee;
+    }
+
+    public function getById($id){
+        if(!$id || !is_numeric($id)){return false;}
+
+        $db = BoardroomBooker::getDB();
+
+        $stmt = $db->prepare('SELECT * FROM employees WHERE id=:id');
+        $res = $stmt->execute(array('id' =>$id));
+        if(!$res){
+            $this->errors[] = $stmt->errorInfo()[2];
+            return false;
+        }
+        $employee = $stmt->fetch(PDO::FETCH_ASSOC);
+        if(!$employee){
+            $this->errors[] = 'Employee with specified id does not exist.';
+            return false;
+        }
+        return $employee;
     }
 }

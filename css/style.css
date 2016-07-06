@@ -33,7 +33,7 @@ body{
 }
 #app_messages_container .app_message{
     display: inline-block;
-    width: 400px;
+    width: 650px;
     text-align: left;
     border: 1px solid black;
     padding: 15px;
@@ -43,6 +43,7 @@ body{
     color: #C43328;
     border-color: #C43328 !important;
 }
+
 /* site top section */
 /* -- header*/
 #main_page_header{
@@ -140,7 +141,6 @@ body{
 .bb_calendar_date{
     display: inline-block;
     text-align: right;
-    /*border: 1px solid red;*/
     position: absolute;
     width: 18px;
     right: 3px;

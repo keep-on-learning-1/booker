@@ -26,4 +26,7 @@ class User{
         $_SESSION['user'] = $user['login'];
         return true;
     }
+    public static function logout(){
+        unset($_SESSION['user']);
+    }
 }

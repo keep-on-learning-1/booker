@@ -16,6 +16,7 @@ class BoardroomBooker{
 	private static $config;
 	private static $db;
 	private $page;
+	private $pageData;
 
 	private function __construct(){}
 	
@@ -79,7 +80,7 @@ class BoardroomBooker{
 			include_once './classes/page_pattern.php';
 			include_once $file;
 			$class_name = ucfirst($this->page);
-			$page_object = new $class_name();
+			$page_object = new $class_name($this->pageData);
 			$page_object->render();
 		}
 	}
@@ -87,12 +88,14 @@ class BoardroomBooker{
 	public static function setMessage($msg, $class=''){
 		self::$messages[] = array('text'=>$msg, 'class'=>$class);
 	}
+
 	public static function getMessages(){
 		if(!isset(self::$messages)){
 			return array();
 		}
 		return self::$messages;
 	}
+
 	public static function getDB(){
 		if(!self::$db){
 			$config =self::getConfig();
@@ -111,5 +114,8 @@ class BoardroomBooker{
 	}
 	public function setPage($page){
 		$this->page=$page;
+	}
+	public function setPageData($data){
+		$this->pageData = $data;
 	}
 }

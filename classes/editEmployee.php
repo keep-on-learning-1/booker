@@ -1,20 +1,25 @@
 <?php
-class AddEmployee extends PagePattern {
+/*
+ * Hidden field 'id' was added for a case of an error will occur during updating employee data.
+ * If the error occurs, employee data will be reloaded from $_POST and employee's id will be lost otherwise.
+ */
+class EditEmployee extends PagePattern {
     private $data;
-    public function __construct(){
-        $this->data = $_POST;
+
+    public function __construct($data = null){
+        if($data){$this->data = $data;}
     }
 
     public function render(){
-
         $this->getHeader('EmployeeList');
         ?>
-        <?php echo $this->renderTopSection('Add an employee')?>
+        <?php echo $this->renderTopSection('Edit the employee')?>
 
         <?php echo $this->renderAppMessages();?>
 
         <div id="add_employee_container">
-            <form method="POST" action="index.php?action=add_employee">
+            <form method="POST" action="index.php?action=edit_employee&id=<?php echo $this->data['id']?>">
+                <input type="hidden" value="<?php echo $this->data['id']?>" name="id">
                 <ul>
                     <li>
                         <label>
@@ -36,9 +41,10 @@ class AddEmployee extends PagePattern {
                     </li>
                 </ul>
                 <br>
-                <input type="submit" value="Add">
+                <input type="submit" value="Edit">
             </form>
         </div>
+
         <?php
         $this->getFooter();
     }
