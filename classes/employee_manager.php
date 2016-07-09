@@ -121,4 +121,15 @@ class EmployeeManager{
         }
         return $employee;
     }
+
+    public static function getEmployeeList(){
+        $db = BoardroomBooker::getDB();
+        $res = $db->query('SELECT * FROM employees');
+        if(!$res){
+            BoardroomBooker::setMessage('getEmployeeList: '.$db->errorInfo()[2], 'msg-error');
+            return false;
+        }
+        $employees_list = $res->fetchAll(PDO::FETCH_ASSOC);
+        return $employees_list;
+    }
 }

@@ -24,6 +24,7 @@ class User{
             return false;
         }
         $_SESSION['user'] = $user['login'];
+        header("location: http://".$_SERVER['HTTP_HOST']);
         return true;
     }
     public static function logout(){

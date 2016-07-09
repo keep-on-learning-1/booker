@@ -1,14 +1,33 @@
 <?php
+/*
+ * Methods:
+ *  - main
+ *  - employee_list
+ *  - add_employee_form
+ *  - add_employee
+ *  - remove_employee
+ *  - edit_employee_form
+ *  - edit_employee
+ *  - book_it
+ *  -
+ *  - login
+ *  - logout
+ *  - __call
+ */
 class CommandController{
     private $booker;
     public function __construct($booker){
         $this->booker = $booker;
     }
+    /*
     public function index(){
         $this->booker->setPage('mainPage');
         return true;
     }
+    */
     public function main(){
+        //include_once('./classes/event_manager.php');
+        //EventManager::getTimeIntervals(7, 2016);
         $this->booker->setPage('mainPage');
         return true;
     }
@@ -139,20 +158,59 @@ class CommandController{
             return true;
         }
         $this->booker->setPage('employeeList');
-        //$this->booker->setPageData(null);
+        $this->booker->setPageData(null);
         BoardroomBooker::setMessage("Employee {$old_employee['name']}( {$old_employee['email']}) was changed to {$_POST['name']}({$_POST['email']})");
         return true;
     }
 
+    public function book_it(){
+        $this->booker->setPage('bookIt');
+        return true;
+    }
+
+    public function create_event(){
+        $this->booker->setPage('bookIt');
+        require_once('./classes/event_manager.php');
+        $event_manager = new EventManager();
+        if(!$event_manager->createEvent($_POST)){
+            $errors = $event_manager->getErrors();
+            if(is_array($errors)){
+                foreach($errors as $e){
+                    BoardroomBooker::setMessage($e, 'msg-error');
+                }
+            }
+            return true;
+        }
+        $this->booker->setPage('mainPage');
+        // all informative messages was created inside the $event_manager->createEvent() method
+        return true;
+    }
+
     public function login(){
-        User::login($_POST);
+        if(!User::login($_POST)){
+            $this->booker->setPage('signIn');
+            return true;
+        }
+        $this->booker->setPage('mainPage');
         return true;
     }
     public function logout(){
-        User:logout();
+        unset($_SESSION['user']);
+        header("Location: http://".$_SERVER['HTTP_HOST'].'/index.php');
         return true;
     }
     public function __call($name, $args){
         return false;
+    }
+
+    public function event_details(){
+
+        parse_str($_SERVER['QUERY_STRING'], $vars);
+        if(!$vars['id']){die;}
+
+        $this->booker->setPage('eventDetails');
+        $this->booker->setPageData($vars['id']);
+
+        return true;
     }
 }

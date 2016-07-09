@@ -24,7 +24,10 @@
 * Для тех из них, у которых элемент controller совпал с event.target, вызывается метод 
 * change_month(year, month).
 *
-* 	document.addEventListener('month_change', function(event){
+* 	methods:
+ * 		-
+ *
+ * 	document.addEventListener('month_change', function(event){
 *		var calendars_list = document.getElementsByClassName('DM_calendar');
 *		for(var i=0;i<calendars_list.length;i++){
 *			var current_calendar = calendars_list[i].dm_calendar;
@@ -41,6 +44,7 @@ function bb_calendar(container, controller, options){
 	this.container = container;
 	
 	var dayRenderer = function(){ return '';};
+	var data; //contains data to populate calendar cells
 	
 	if(!container){
 		throw new Error('Container element has not been given to constructor');
@@ -62,15 +66,21 @@ function bb_calendar(container, controller, options){
 	this.depends_of = depends_of;
 	this.setDayRenderer = function(func){
 		if(typeof(func) != 'function'){return;}
-		dayRenderer = func;
+		dayRenderer = func; // global variable
 	};
-	
+	this.setData = function($data){
+		data = $data; // global variable
+	}
+	this.getData = function(){return data;}
+
 	/* Internal methods */
+
 	function depends_of(event){
 		return (event.target === this.controller.container);
 	};
-	
+
 	function change_month(year, month){
+
 		var date = new Date(year, month);
 		var first_week_offset = (date.getDay() || 7) - 1;
 		
@@ -106,8 +116,20 @@ function bb_calendar(container, controller, options){
 			var current_cell_content = Array(
 				'<span class="bb_calendar_date">' + date_counter + '</span>'
 			);
-			current_cell_content.push(dayRenderer());
-			cells[i].innerHTML = current_cell_content.join('\n');
+
+			var data = this.getData();
+			if(data[date_counter]){
+				var length = data[date_counter].length;
+				for(var len=0; len<length; len++){
+					var id = data[date_counter][len].id;
+					current_cell_content.push('<a class="event_time" href="" data-id="'+ id +'">');
+					var str = data[date_counter][len].start + ' - ' +  data[date_counter][len].end;
+					current_cell_content.push(str);
+					current_cell_content.push('</a>');
+				}
+			}
+
+			cells[i].innerHTML = current_cell_content.join(' \n');
 			date_counter++
 		}
 	}

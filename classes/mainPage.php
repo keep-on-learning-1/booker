@@ -3,13 +3,16 @@ class MainPage extends PagePattern {
     private $config;
     private $number_of_bookers;
     private $month;
+	private $events;
     function __construct(){
         $this->config = BoardroomBooker::getConfig();
 
         $this->number_of_bookers = $this->config['booker']['number_of_bookers'];
         if(!(int)$this->number_of_bookers){$this->number_of_bookers = 3;}
         require_once('./classes/InitMonth.php');
+        require_once('./classes/event_manager.php');
         $this->month = new InitMonth();
+		$this->events = EventManager::getTimeIntervals($this->month->this_month, $this->month->this_year);
     }
 
     function render(){
@@ -43,9 +46,19 @@ class MainPage extends PagePattern {
 					<tr>
 						<?php for($day=0; $day<7; $day++): ?>
 							<td>
+								<?php $current_date = $month->get_the_day() ?>
 								<span class="bb_calendar_date">
-									<?php echo $month->get_the_day()?>
+									<?php echo $current_date?>
 								</span>
+								<?php $day_events = $this->events[$current_date]?>
+								<?php if(is_array($day_events)):?>
+									<?php foreach($day_events as $event):?>
+										<a class="event_time" href="" data-id="<?php echo $event['id']; ?>">
+											<?php echo $event['start'],' - ', $event['end'],'<br>' ?>
+										</a>
+									<?php endforeach; ?>
+								<?php endif;?>
+
 							</td>
 						<?php endfor; ?>
 					</tr>

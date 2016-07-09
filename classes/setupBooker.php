@@ -9,7 +9,7 @@ class SetupBooker extends PagePattern {
         $this->getHeader('Configuration of BoardroomBooker');
         ?>
         <div class="form_page_header">
-            <h1 id="tuner">Configuration of BoardroomBooker</h1>
+            <h1>Configuration of BoardroomBooker</h1>
         </div>
         <div class="default_form_container">
             <form id="bb_config_form" action="createUser.php" method="POST">

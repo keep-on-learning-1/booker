@@ -10,9 +10,6 @@ class EmployeeList extends PagePattern {
            BoardroomBooker::setMessage($db->errorInfo()[2], 'msg-error');
         }
         $this->employee_list = $res->fetchAll(PDO::FETCH_ASSOC);
-        //echo $res->errorCode();
-        //$employee_list = $res->fetchAll(PDO::FETCH_ASSOC);
-
     }
 
     function render(){
@@ -59,8 +56,7 @@ class EmployeeList extends PagePattern {
                     var target = e.target;
                     while(target != this){
                         if(target.classList.contains('remove_link')){
-                            alert('ok');
-                            return;
+                            return confirm('Are you sure you want to delete this contact?');
                         }
                         target = target.parentNode;
                     }

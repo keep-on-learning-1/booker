@@ -1,7 +1,23 @@
 body{
     background: #A3BF9B;
+   /* width: 1080px;*/
 }
-/*Default form*/
+/*
+    1. Default form
+    2. Displaying messages
+    3. Site top
+        - header
+        - Site 'logo' and page name
+    4. Main page
+        - CalendarController
+        - Calendar
+    5. Event details page
+    6. Employees list page
+    7. Add employee page
+    8. Create event page
+    9. Controls
+*/
+/* 1. Default form*/
 .default_form_container,
 .form_page_header{
     text-align: center;
@@ -27,7 +43,8 @@ body{
 #bb_config_form label{width: 125px;}
 #sign_in_form   label{width: 80px;}
 
-/*Displaying messages*/
+
+/* 2. Displaying messages*/
 #app_messages_container{
     text-align: center;
 }
@@ -44,7 +61,7 @@ body{
     border-color: #C43328 !important;
 }
 
-/* site top section */
+/* 3.  Site top */
 /* -- header*/
 #main_page_header{
     text-align: center;
@@ -88,7 +105,7 @@ body{
     border: 1px solid black;
     margin-left: 15px;
 }
-/*Main page*/
+/* 4. Main page*/
 /* -- CalendarController*/
 .CalendarControl_button-left,
 .CalendarControl_button-right,
@@ -109,7 +126,7 @@ body{
 }
 .CalendarControl_controller-container{
     border: 1px solid black;
-    padding: 15px;
+    padding: 15px 19px;
     background: #CFC;
     display: inline-block;
 }
@@ -121,22 +138,23 @@ body{
     float: left;
 }
 #bb_calendar thead td{
-    /*height: 40px;
-    line-height: 40px;*/
     font-weight: bold;
     font-family: sans-serif;
+    padding: 5px;
 }
 #bb_calendar thead tr{
     text-align: center;
 }
 
 #bb_calendar tbody tr{
-    height: 50px;
+    height: 80px;
+    text-align: center;
 }
 #bb_calendar td{
     border: 2px solid black;
-    width: 100px;
+    width: 120px;
     position: relative;
+    padding: 20px 5px 5px;
 }
 .bb_calendar_date{
     display: inline-block;
@@ -146,10 +164,85 @@ body{
     right: 3px;
     top: 3px;
 }
+.event_time{
+    font: 14px solid sans-serif;
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
 #main_buttons_container{
 
 }
-/*Employees list page*/
+/*
+//-------------------------------------------------
+*/
+/* 5. Event details page */
+#event_details_form{
+    width: 220px;
+}
+#event_details_form .line{
+    background-color: #CFC;
+    border: 1px solid black;
+    margin: 0;
+    line-height: 30px;
+    display: inline-block;
+}
+#event_details_form .details_caption{
+    width: 50px;
+    border-right: 1px solid black;
+    margin: 0;
+    padding-left: 5px;
+    box-sizing: border-box ;
+    display: inline-block;
+}
+#event_details_form .line_content_bg{
+    background-color: white;
+    display: inline-block;
+    width: 158px;
+    padding-left: 10px;
+}
+#event_details_form input[name="start_time"],
+#event_details_form input[name="end_time"],
+#event_details_form input[name="specifics"],
+#event_details_form select{
+    border: none;
+    line-height: 25px;
+
+}
+#event_details_form input[name="start_time"],
+#event_details_form input[name="end_time"]{
+    width: 60px;
+    padding-left: 5px;
+}
+#event_details_form input[name="specifics"]{
+    width: 143px;
+    padding-left: 5px;
+}
+#event_details_form select{width: 148px;}
+.details_submited{
+        padding-left: 5px;
+        width: 213px;
+}
+
+.details_form_footer{
+    text-align: center;
+    background-color: unset !important;
+    border: none !important;
+
+}
+.details_form_footer input{margin: 5px;}
+.relations_checkbox_placeholder{
+    display: inline-block;
+    line-height: 20px;
+    height: 25px;
+    box-sizing: border-box;
+    padding: 5px;
+    margin-top: 5px;
+}
+/*
+//-------------------------------------------------
+*/
+/* 6. Employees list page*/
 #employee_container{
     text-align: center;
     background-color: #fff;
@@ -175,14 +268,13 @@ body{
 #add_employee_button:visited{
     color: black;
 }
-/*Add employee page*/
+/* 7. Add employee page*/
 #add_employee_container{
     background-color: white;
     padding: 20px;
 
 }
 #add_employee_container ul{
-    /*list-style: none;*/
     display: inline-block;
     padding: 0;
     margin: 0;
@@ -206,7 +298,21 @@ body{
     width: 200px;
     margin-top: 20px;
 }
-/*Controls*/
+/* 8. Create event page*/
+#create_event_form_container{
+    background-color: #fff;
+    padding: 20px;
+
+}
+#create_event_form_container .caption{
+    display: inline-block;
+    margin-bottom: 15px;
+}
+#duration_input{
+    width: 50px;
+}
+
+/* 9. Controls*/
 .bb_button{
     display: inline-block;
     background-color: #CCFFCC;

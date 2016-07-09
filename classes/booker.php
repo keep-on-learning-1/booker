@@ -1,10 +1,18 @@
 <?php
 /*
  * Класс представляет объект приложения.
- * 		Методы:
- * 			getInstance - получение экземпляра объекта
- * 			init 		- инициализация объекта. Определяет какая страница будет отображена
- * 			invokePage 	- получение объекта Page. Получение html кода, который будет отображен.
+ * 	Методы:
+ * 		getInstance - получение экземпляра объекта
+ * 		init 		- инициализация объекта. Определяет какая страница будет отображена
+ * 		invokePage 	- получение объекта Page. Получение html кода, который будет отображен.
+ *
+ * 		setPage
+ * 		setPageData
+ *
+ * 		setMessage
+ * 		getMessage
+ * 		getDB
+ * 		getConfig
  *
  * Метод init при вызове проверяет создн ли файл booker.conf. Если файла не существует - предполагается, что
  * это первый запуск приложения и, по очереди, будут отображены страницы setup_database и setup_booker.
@@ -67,9 +75,17 @@ class BoardroomBooker{
 			return;
 		}
 
+		/*Handle AJAX request*/
+		if($method_name=='ajax'){
+			include_once './classes/ajax_controller.php';
+			$ajax = new AjaxController();
+			$ajax->$variables['m']();
+			die;
+		}
+
 		/*Main or target page*/
 		$controller = new CommandController($this);
-		if(!$controller->$method_name()){$controller->main();};
+		if(!$controller->$method_name()){$controller->main();}
 
 		if(!$this->page){$this->page = 'mainPage';}
 	}
@@ -110,6 +126,13 @@ class BoardroomBooker{
 		return self::$db;
 	}
 	public static function getConfig(){
+		if(!self::$config){
+			if(!file_exists('booker.conf')){
+				die('Config file was not found');
+			}
+			self::$config = parse_ini_file('booker.conf',1);
+			if(!self::$config){die('Can\'t read config file');}
+		}
 		return self::$config;
 	}
 	public function setPage($page){

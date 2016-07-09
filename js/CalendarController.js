@@ -55,7 +55,7 @@ function CalendarController(container, options){
 	var self = this;
 
 	left.addEventListener('click', function(){
-		self.date.setMonth(self.date.getMonth() - 1); 
+		self.date.setMonth(self.date.getMonth() - 1); // 0..11
 		var new_month = self.date.getMonth(); 
 		var new_year = self.date.getFullYear();
 		
@@ -64,12 +64,13 @@ function CalendarController(container, options){
 		var custom_change_event = document.createEvent("Event");
 		custom_change_event.month = new_month;
 		custom_change_event.year = new_year;
+		//alert(new_month);
 		
 		custom_change_event.initEvent('month_change',true,true);
 		this.parentElement.dispatchEvent(custom_change_event);
 	});
 	right.addEventListener('click', function(){
-		self.date.setMonth(self.date.getMonth() + 1); 
+		self.date.setMonth(self.date.getMonth() + 1); // 0..11
 		var new_month = self.date.getMonth(); 
 		var new_year = self.date.getFullYear();
 		
@@ -98,7 +99,12 @@ function CalendarController(container, options){
 	container.appendChild(caption);
 	container.appendChild(right);
 	
-	this.init = function(){
-	
+	this.refresh = function(){
+		var custom_change_event = document.createEvent("Event");
+		custom_change_event.month = self.date.getMonth();
+		custom_change_event.year = self.date.getFullYear();
+
+		custom_change_event.initEvent('month_change',true,true);
+		this.container.dispatchEvent(custom_change_event);
 	}
 }
