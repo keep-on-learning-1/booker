@@ -74,6 +74,7 @@ class EventDetails extends PagePattern {
         </div>
             <script>
                 var update_button = document.getElementById('update_button');
+                var delete_button = document.getElementById('delete_button');
                 var form = document.forms.event_details_form;
 
                 var initial_values;
@@ -99,7 +100,6 @@ class EventDetails extends PagePattern {
                             if(!this.responseText ){
                                 window.opener.display_message('An error was occurred during event derails updating')
                             }
-                            console.log(this.responseText);
                             var ansver = JSON.parse(this.responseText);
                             if(!ansver['result']){
                                 for(var i=0; i<ansver['cause'].length;i++ ){
@@ -134,6 +134,37 @@ class EventDetails extends PagePattern {
                         if(initial_values[k] != current_values[k]){return true}
                     }
                     return false;
+                }
+
+                delete_button.onclick = function(event){
+                    event.preventDefault();
+
+                    var ansver;
+                    var xhr =  new XMLHttpRequest();
+                    var formData = new FormData(form);
+                    xhr.open('POST', '/index.php?action=ajax&m=deleteEvent');
+                    xhr.onreadystatechange = function(){
+                        if(this.readyState != 4){return;}
+                        if (this.status != 200) {
+                            //throw new Exception( xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
+                        } else {
+                            if(!this.responseText ){
+                                window.opener.display_message('An error was occurred during event derails updating')
+                            }
+                            var ansver = JSON.parse(this.responseText);
+                            if(!ansver['result']){
+                                for(var i=0; i<ansver['cause'].length;i++ ){
+                                    window.opener.display_message(ansver['cause']);
+                                }
+                                return;
+                            }
+                            var str = ['Event '  + initial_values.start_time + '-' + initial_values.end_time + ' was deleted'];
+                            window.opener.display_message(str.join("\r\n"));
+                            window.opener.external_controller_link.refresh();
+                            window.close();
+                        }
+                    }
+                    xhr.send(formData);
                 }
             </script>
         <?php

@@ -2,7 +2,6 @@
 /*
  * Class incapsulates all initial values for a first month that will be displayed on page after
  * its loading.
- * Class also provides methods to get list of events from database.
  * methods list:
  * 	- getInitialMonth
  *  - getDaysOfWeek
@@ -70,7 +69,7 @@ class InitMonth{
 
 	/*
 	 * TODO: delete
-	 * Provides posibility to set russil
+	 * Provides posibility to set russian names of days for calendar
 	 */
 	function setDaysOfWeek($days){
 		if(!is_array($days) || count($days) != 7){

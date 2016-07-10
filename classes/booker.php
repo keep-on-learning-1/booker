@@ -1,7 +1,6 @@
 <?php
 /*
- * Класс представляет объект приложения.
- * 	Методы:
+ * 	Methods:
  * 		getInstance - получение экземпляра объекта
  * 		init 		- инициализация объекта. Определяет какая страница будет отображена
  * 		invokePage 	- получение объекта Page. Получение html кода, который будет отображен.
@@ -91,9 +90,9 @@ class BoardroomBooker{
 	}
 
 	public function invokePage(){
-		$file = './classes/' . $this->page . '.php';
+		$file = './classes/pages/' . $this->page . '.php';
 		if(file_exists($file)){
-			include_once './classes/page_pattern.php';
+			include_once './classes/pages/page_pattern.php';
 			include_once $file;
 			$class_name = ucfirst($this->page);
 			$page_object = new $class_name($this->pageData);

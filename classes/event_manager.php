@@ -17,6 +17,7 @@
  *  - updateEvent
  *  - updateEvent
  *  - get24hTime
+ *  - deleteEvent
  */
 class EventManager{
     private $errors;
@@ -242,7 +243,7 @@ class EventManager{
         $res = $stmt->execute( array('start_time' => $start,'end_time' => $end, 'self_id' => $self_id));
         if(!$this->checkRes($res, $stmt)){return false;}
 
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetch(PDO::FETCH_COLUMN);
     }
 
     /*
@@ -304,12 +305,12 @@ class EventManager{
         $db = BoardroomBooker::getDB();
 
         foreach($intervals as $key => $interval){
-            $query_parts[] = "(  FROM_UNIXTIME(:start_time_{$key}),
-                                 FROM_UNIXTIME(:end_time_{$key}),
+            $query_parts[] = "(  :start_time_{$key},
+                                 :end_time_{$key},
                                  :event_id_{$key}
                                )";
-            $values['start_time_'.$key] = $interval['start']->getTimestamp();
-            $values['end_time_'.$key] = $interval['end']->getTimestamp();
+            $values['start_time_'.$key] = $interval['start']->format("Y-m-d H:i:s");
+            $values['end_time_'.$key] = $interval['end']->format("Y-m-d H:i:s");
             $values['event_id_'.$key] = $id;
         }
         $query = "INSERT INTO times (start_time, end_time, event_id) VALUES ".implode(', ',$query_parts);
@@ -394,6 +395,7 @@ class EventManager{
         $db = BoardroomBooker::getDB();
 
         if($data['all_occurrences'] || !$data['was_recurring']){
+
             /* Get a day and a year for events to create DataTime objects.
              * It is necessary for checking new time slots of events.
              * Events should not be changed if their new time slots overlaps with the time of any other event.
@@ -409,12 +411,15 @@ class EventManager{
             foreach($intervals_str as $k => $interval){
                 $intervals_obj[$k]['start'] = new DateTime($interval[0]['start_time']);
                 $intervals_obj[$k]['end'] = new DateTime($interval[0]['end_time']);
-
             }
 
             /* Set a new time for each time object and check it*/
             $new_start_time = $this->get24hTime($data['start_time']);
             $new_end_time = $this->get24hTime($data['end_time']);
+            if(strtotime($data['end_time']) <= strtotime($data['start_time'])){
+                $this->errors[] = "Incorrect event time";
+                return false;
+            }
             if(!$new_start_time || !$new_end_time){
                 $this->errors[] = "Incorrect event time";
                 return false;
@@ -426,7 +431,6 @@ class EventManager{
                 if($res>0 || $res === false){
                     $this->errors[] = 'Specified event time overlaps with another event'.'<br>['.$this->getStringInterval($time_arr).']';
                 }
-
             }
             if($this->errors){return false;}
 
@@ -439,7 +443,7 @@ class EventManager{
                            SET start_time=DATE_FORMAT(start_time, '%Y-%m-%d {$st}'),
                                end_time=DATE_FORMAT(end_time, '%Y-%m-%d {$et}')
                            WHERE event_id=:event_id";
-            $stmp = $db->prepare($query);
+            $stmt = $db->prepare($query);
 
             $res = $stmt->execute(array('event_id' => $data['event_id']));
             if(!$this->checkRes($res, $stmt)){return false;}
@@ -456,7 +460,6 @@ class EventManager{
             /*Check if the new time is available*/
             $query = "SELECT id, start_time, end_time FROM times WHERE id=:time_id";
             $stmt = $db->prepare($query);
-
             $res = $stmt->execute(array('time_id' => $data['times_id']));
             if(!$this->checkRes($res, $stmt)){return false;}
 
@@ -471,6 +474,10 @@ class EventManager{
             /* Set a new time for each time object and check it*/
             $new_start_time = $this->get24hTime($data['start_time']);
             $new_end_time = $this->get24hTime($data['end_time']);
+            if(strtotime($data['end_time']) <= strtotime($data['start_time'])){
+                $this->errors[] = "Incorrect event time";
+                return false;
+            }
             if(!$new_start_time || !$new_end_time){
                 $this->errors[] = "Incorrect event time";
                 return false;
@@ -487,8 +494,7 @@ class EventManager{
             if($this->errors){return false;}
             //-------------------
             $query = "INSERT INTO events (recurring, employee_id, specifics) VALUES ( 0, :employee_id, :specifics)";
-            $stmp = $db->prepare($query);
-
+            $stmt = $db->prepare($query);
             $res = $stmt->execute(array('employee_id' => $data['employee_id'], 'specifics' => $data['specifics']));
             if(!$this->checkRes($res, $stmt)){return false;}
 
@@ -502,6 +508,19 @@ class EventManager{
             $stmt = $db->prepare($query);
             $res = $stmt->execute(array('times_id' => $data['times_id']));
             if(!$this->checkRes($res, $stmt)){return false;}
+
+            //------------------
+            $query = "SELECT COUNT(*) FROM times WHERE event_id=:event_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('event_id'=>$data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+            $count = $stmt->fetch(PDO::FETCH_COLUMN);
+            if($count==1){
+                $query = "UPDATE events SET recurring=0 WHERE id=:event_id";
+                $stmt = $db->prepare($query);
+                $res = $stmt->execute(array('event_id'=>$data['event_id']));
+                if(!$this->checkRes($res, $stmt)){return false;}
+            }
         }
         return true;
     }
@@ -521,16 +540,43 @@ class EventManager{
     }
 
     function deleteEvent($data){
+        $db = BoardroomBooker::getDB();
         if($data['all_occurrences'] || !$data['was_recurring']){
-            $query = "DELETE FROM events WHERE id=:event_id";
             $query = "DELETE FROM times WHERE event_id=:event_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('event_id'=>$data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+
+            $query = "DELETE FROM events WHERE id=:event_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('event_id'=>$data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
         }else{
-            $query = "SELECT COUNT(*) FROM times WHERE id=:event_id";
-            $query = "DELETE FROM times WHERE id=:event_id";
-            if($count < 2){
+            $query = "DELETE FROM times WHERE id=:times_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('times_id'=>$data['times_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+
+            $query = "SELECT COUNT(*) FROM times WHERE event_id=:event_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('event_id'=>$data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+            $count = $stmt->fetch(PDO::FETCH_COLUMN);
+
+            if($count == 1){
+                $query = "UPDATE events SET recurring=0 WHERE id=:event_id";
+                $stmt = $db->prepare($query);
+                $res = $stmt->execute(array('event_id'=>$data['event_id']));
+                if(!$this->checkRes($res, $stmt)){return false;}
+            }
+            if($count == 0){ // should not happened
                 $query = "DELETE FROM events WHERE id=:event_id";
+                $stmt = $db->prepare($query);
+                $res = $stmt->execute(array('event_id'=>$data['event_id']));
+                if(!$this->checkRes($res, $stmt)){return false;}
             }
         }
+        return true;
     }
     function checkRes($res, $stmt){
         if(!$res){

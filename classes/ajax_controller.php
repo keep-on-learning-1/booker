@@ -25,6 +25,17 @@ class AjaxController{
         die(json_encode(array('result' => true, 'cause' => '')));
     }
 
+    public function deleteEvent(){
+        require_once("./classes/event_manager.php");
+        $event_manager = new EventManager();
+
+        if(!$event_manager->deleteEvent($_POST)){
+            $arr = array('result' => false, 'cause' => $event_manager->getErrors());
+            die(json_encode($arr));
+        }
+        die(json_encode(array('result' => true, 'cause' => '')));
+    }
+
     public function __call($name, $args){
         return false;
     }

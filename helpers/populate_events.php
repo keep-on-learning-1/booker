@@ -11,6 +11,7 @@
     $cy = date('Y');
 
     /*Единичные события*/
+
 	$values = array(
         [
             (new DateTime("1-$cm-$cy 7:00"))->getTimestamp(),
@@ -130,4 +131,5 @@
         }
 
     }
+    echo '<hr>DONE';
 ?>
