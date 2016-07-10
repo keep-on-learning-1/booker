@@ -82,8 +82,13 @@ function bb_calendar(container, controller, options){
 	function change_month(year, month){
 
 		var date = new Date(year, month);
-		var first_week_offset = (date.getDay() || 7) - 1;
-		
+		var first_day = container.getAttribute('data-first_day');
+		if(first_day == 'sunday'){
+			var first_week_offset = date.getDay();
+		}else{
+			var first_week_offset = (date.getDay() || 7) - 1;
+		}
+
 		//Getting number of days in requested month
 		var days_in_month = 0
 		while(date.getMonth() == month){

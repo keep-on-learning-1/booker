@@ -11,7 +11,9 @@ class MainPage extends PagePattern {
         if(!(int)$this->number_of_bookers){$this->number_of_bookers = 3;}
         require_once('./classes/InitMonth.php');
         require_once('./classes/event_manager.php');
-        $this->month = new InitMonth();
+		$first_day = $this->config['booker']['first_day'];
+        $this->month = new InitMonth($first_day);
+		//dd($this->month);
 		$this->events = EventManager::getTimeIntervals($this->month->this_month, $this->month->this_year);
     }
 
@@ -30,11 +32,11 @@ class MainPage extends PagePattern {
 
         <?php echo $this->renderAppMessages();?>
 
-		<div id="calendar_container">
+		<div id="calendar_container" data-first_day='<?php echo $this->config['booker']['first_day']?>'>
 			<table id='bb_calendar'>
 				<thead>
 					<tr>
-					<?php foreach($month->getDaysOfWeek() as $day_caption): ?>
+					<?php foreach($month->getDaysOfWeek($this->config['booker']['first_day']) as $day_caption): ?>
 						<td>
 							<?php echo $day_caption; ?>
 						</td>

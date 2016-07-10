@@ -578,6 +578,10 @@ class EventManager{
         }
         return true;
     }
+
+    /*
+     * Check an error occurred during handling request to database
+     */
     function checkRes($res, $stmt){
         if(!$res){
             $this->errors[] = $stmt->errorInfo()[2];

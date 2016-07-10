@@ -13,6 +13,7 @@
 
 class InitMonth{
 	private $days_of_week = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+	private $days_of_week_sun = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	private $date;
 	private $days_in_month;
 	private $first_week_offset;
@@ -24,14 +25,20 @@ class InitMonth{
 	public $this_year;
 
 	
-	public function __construct($date_string = ''){
+	public function __construct($first_day = 'monday'){
+		$first_day = 'sunday';
 
 		$this->date = new DateTime('first day of this month');
 		$this->days_in_month = (int)$this->date->format('t');// 28..31
-		$this->first_week_offset = (int)$this->date->format('N') - 1; // 1(Mon)..7(Sun) //see also 'w'
-		$this->weeks_in_month = ceil(($this->days_in_month + $this->first_week_offset)/7);
-		$this->first_week_offset_countdown = $this->first_week_offset;
 		$this->days_counter = 1;
+		if($first_day == 'monday') {
+			$this->first_week_offset = (int)$this->date->format('N') - 1; // 1(Mon)..7(Sun)
+
+		}else{
+			$this->first_week_offset = (int)$this->date->format('w'); // 0(Sun)..6(Sat)
+		}
+		$this->weeks_in_month = ceil(($this->days_in_month + $this->first_week_offset) / 7);
+		$this->first_week_offset_countdown = $this->first_week_offset;
 
 		$this->this_month = (int)$this->date->format('m');
 		$this->this_year = (int)$this->date->format('Y');
@@ -47,7 +54,10 @@ class InitMonth{
 	/*
 	 * 	Returns array with textual representations of a days, three letters
 	 */
-	function getDaysOfWeek(){
+	function getDaysOfWeek($first_day = ''){
+		if($first_day == 'sunday'){
+			return $this->days_of_week_sun;
+		}
 		return $this->days_of_week;
 	}
 
