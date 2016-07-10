@@ -26,14 +26,11 @@ class InitMonth{
 
 	
 	public function __construct($first_day = 'monday'){
-		$first_day = 'sunday';
-
 		$this->date = new DateTime('first day of this month');
 		$this->days_in_month = (int)$this->date->format('t');// 28..31
 		$this->days_counter = 1;
 		if($first_day == 'monday') {
 			$this->first_week_offset = (int)$this->date->format('N') - 1; // 1(Mon)..7(Sun)
-
 		}else{
 			$this->first_week_offset = (int)$this->date->format('w'); // 0(Sun)..6(Sat)
 		}
