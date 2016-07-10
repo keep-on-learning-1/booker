@@ -7,6 +7,7 @@ class EventDetails extends PagePattern {
         require_once('./classes/event_manager.php');
         require_once('./classes/employee_manager.php');
         $this->event = EventManager::getById($id);
+        //dd( $this->event);
         $this->employees_list = EmployeeManager::getEmployeeList();
     }
 
@@ -18,6 +19,10 @@ class EventDetails extends PagePattern {
         <div class="default_form_container">
             <h2>B.B. DETAILS</h2>
             <form method="POST" id="event_details_form" >
+                <input type="hidden" name="was_recurring" value="<?php echo $this->event['recurring']?>">
+                <input type="hidden" name="event_id" value="<?php echo $this->event['event_id']?>">
+                <input type="hidden" name="times_id" value="<?php echo $this->event['times_id']?>">
+
                 <div class="line">
                     <div class="details_caption">
                         When:
@@ -36,7 +41,7 @@ class EventDetails extends PagePattern {
                     <div class="details_caption">
                         Who:
                     </div><span class="line_content_bg">
-                        <select name="employee">
+                        <select name="employee_id">
                             <option value="0">&nbsp;</option>
                             <?php foreach($this->employees_list as $employee):?>
                                <?php $check = ($employee['id'] == $this->event['employee_id'])?'selected':'';?>
@@ -91,16 +96,25 @@ class EventDetails extends PagePattern {
                         if (this.status != 200) {
                             //throw new Exception( xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
                         } else {
+                            if(!this.responseText ){
+                                window.opener.display_message('An error was occurred during event derails updating')
+                            }
+                            console.log(this.responseText);
                             var ansver = JSON.parse(this.responseText);
                             if(!ansver['result']){
-                                window.opener.display_message(ansver['cause']);
+                                for(var i=0; i<ansver['cause'].length;i++ ){
+                                    window.opener.display_message(ansver['cause']);
+                                }
+                                return;
                             }
-                            var str = 'Event '  + initial_values.start_time + '-' + initial_values.end_time
-                            + ' was changed to '+ current_values.start_time + '-' + current_values.end_time
-                            + '<br> Event text: '+ current_values.specifics;
-
-                            window.opener.display_message(str);
+                            var str = [
+                                'Event '  + initial_values.start_time + '-' + initial_values.end_time,
+                                ' was changed to '+ current_values.start_time + '-' + current_values.end_time,
+                                '<br> Event text: '+ current_values.specifics
+                            ];
+                            window.opener.display_message(str.join("\r\n"));
                             window.opener.external_controller_link.refresh();
+                            window.location.reload();
                         }
                     }
                     xhr.send(formData);
@@ -111,7 +125,7 @@ class EventDetails extends PagePattern {
                         'start_time': document.getElementsByName('start_time')[0].value,
                         'end_time'  : document.getElementsByName('end_time')[0].value,
                         'specifics' : document.getElementsByName('specifics')[0].value,
-                        'employee'  : document.getElementsByName('employee')[0].value
+                        'employee'  : document.getElementsByName('employee_id')[0].value
                     }
                 }
 
@@ -120,7 +134,6 @@ class EventDetails extends PagePattern {
                         if(initial_values[k] != current_values[k]){return true}
                     }
                     return false;
-
                 }
             </script>
         <?php

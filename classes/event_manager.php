@@ -2,6 +2,21 @@
 /*
  * Methods:
  *  - createEvent
+ *  - getErrors
+ *  - checkFields
+ *  - validateTime
+ *  - setTime
+ *  - getTime
+ *  - createEventTime
+ *  - checkIsTimeAvailable
+ *  - getStringInterval
+ *  - insertEventBody
+ *  - insertEventTime
+ *  - getTimeIntervals
+ *  - getById
+ *  - updateEvent
+ *  - updateEvent
+ *  - get24hTime
  */
 class EventManager{
     private $errors;
@@ -34,7 +49,7 @@ class EventManager{
         $all_time_intervals = $this->createEventTime($this->getTime(),$data);
         foreach($all_time_intervals as $time_interval){
             $res = $this->checkIsTimeAvailable($time_interval);
-            if($res > 0){
+            if($res > 0 || $res === false){
                 $this->errors[] = 'Specified event time overlaps with another event:'.
                                   '<br>'.$this->getStringInterval($time_interval);
             }
@@ -113,6 +128,11 @@ class EventManager{
         return true;
     }
 
+    /*
+     *  Method tryes to create DateTime objects for the start and the end of an event using array of data.abstract
+     *  It will return true if objects are created, false otherwise.
+     *  Puts created objects into appropriate protected properties.
+     */
     public function setTime($data){
 
         $start_data_str =   ($data['event_month']+1).'-'.
@@ -147,8 +167,20 @@ class EventManager{
     }
 
     /*
-     * Method creates time ranges for an event using start time objects and informtion
-     * about event recurrence.
+     *  Method creates time ranges for an event using start and end time objects and informtion
+     *  about event recurrence.
+     *
+     *  return array(
+     *      0 => [
+     *          "start" => DateTime start
+     *          "end" => DateTime end
+     *      ],
+     *      ...
+     *      1 => [
+     *          "start" => DateTime start
+     *          "end" => DateTime end
+     *      ]
+     *  )
      */
     public function createEventTime($time_arr, $data){
 
@@ -177,10 +209,17 @@ class EventManager{
     }
 
     /*
-     * Checks if time of the event overlaps with time intervals of already scheduled events
-     * Returns 0 if no overlaps found.
+     * Checks if time of the event overlaps with time intervals of already scheduled events.
+     * Parameter $id is an identifier of checking event time slot. It allows to create a new time slot for event
+     * that overlaps with its old one.
+     * Returns 0 if no overlaps found, false if error occurred
+     *
+     * input: array(
+     *      'start' => DateTime start,
+     *      'end' => DateTime end
+     *  )
      */
-    public function checkIsTimeAvailable($time_arr){
+    public function checkIsTimeAvailable($time_arr, $self_id = 0){
         if(!is_array($time_arr) || !$time_arr['start'] || !$time_arr['end']){
             $this->errors[] = 'checkIsTimeAvailable: Corrupted input data';
             return false;
@@ -192,20 +231,27 @@ class EventManager{
 
         $db = BoardroomBooker::getDB();
         $query = "SELECT COUNT(*) FROM times
-	              WHERE LEAST(UNIX_TIMESTAMP(end_time), :end_time) -
-	                    GREATEST(UNIX_TIMESTAMP(start_time), :start_time) > 0";
+	              WHERE LEAST(UNIX_TIMESTAMP(end_time), UNIX_TIMESTAMP(:end_time)) - GREATEST(UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(:start_time)) > 0
+	              AND id <> :self_id";
         $stmt = $db->prepare($query);
-        $start =  $time_arr['start']->getTimestamp();
-        $end = $time_arr['end']->getTimestamp();
-        $res = $stmt->execute( array('start_time' => $start,'end_time' => $end));
 
-        if(!$res){
-            echo $this->errors[] = $stmt->errorInfo()[2];
-            return false;
-        }
-        return $stmt->fetch(PDO::FETCH_COLUMN);
+        /*Time string used instead of timestamp to avoid problem with time zone*/
+        $start =  $time_arr['start']->format('Y-m-d H:i:s');
+        $end = $time_arr['end']->format('Y-m-d H:i:s');
+
+        $res = $stmt->execute( array('start_time' => $start,'end_time' => $end, 'self_id' => $self_id));
+        if(!$this->checkRes($res, $stmt)){return false;}
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    /*
+     * Returns time interval as a string. Time is formatted according to program configuration.
+     * input: array(
+     *      'start' => DateTime start,
+     *      'end' => DateTime end
+     *  )
+     */
     function getStringInterval($time_arr){
         if(!is_array($time_arr) || !$time_arr['start'] || !$time_arr['end']){
             $this->errors[] = 'getStringInterval: Corrupted input data';
@@ -228,21 +274,32 @@ class EventManager{
         }
         return $time_string;
     }
+
+    /*
+     * Create a row in a table of events in database.
+     * Uses data from the event creation form.
+     * Returns last insert id or false if error occurred.
+     */
     public function insertEventBody($data){
         $db = BoardroomBooker::getDB();
         $query = "INSERT INTO events (recurring, employee_id, specifics)
                   VALUES (:recurring, :employee_id, :specifics)";
         $stmt = $db->prepare($query);
+
         $res = $stmt->execute(array('recurring'=>(int)$data['is_recurred'],
                                     'employee_id'=>$data['employee'],
                                     'specifics'=>$data['specifics']) );
-        if(!$res){
-            echo $this->errors[] = $stmt->errorInfo()[2];
-            return false;
-        }
+        if(!$this->checkRes($res, $stmt)){return false;}
+
         return $db->lastInsertId();
     }
 
+    /*
+     * Create a row in a table of event time in database.
+     * Uses database id of last inserted event and array of DateTime objects that represents
+     * the start and the end of an event.
+     * Returns true if row created or false if error occurred.
+     */
     public function insertEventTime($id, $intervals){
         $db = BoardroomBooker::getDB();
 
@@ -257,14 +314,17 @@ class EventManager{
         }
         $query = "INSERT INTO times (start_time, end_time, event_id) VALUES ".implode(', ',$query_parts);
         $stmt=$db->prepare($query);
+
         $res = $stmt->execute($values);
-        if(!$res){
-            echo $this->errors[] = $stmt->errorInfo()[2];
-            return false;
-        }
+        if(!$this->checkRes($res, $stmt)){return false;}
+
         return true;
     }
 
+    /*
+     * Returns time for all events in the specified month(and year)
+     * Used to populate calendar with time intervals.
+     */
     public static function getTimeIntervals($month, $year){
         $db = BoardroomBooker::getDB();
         $config =BoardroomBooker::getConfig();
@@ -293,7 +353,12 @@ class EventManager{
         return $time;
     }
 
+    /*
+     * Return event data for specified time interval
+     * Returns true if row created or false if error occurred.
+     */
     public static function getById($id){
+
         $db = BoardroomBooker::getDB();
         $config =BoardroomBooker::getConfig();
         $format = ($config['booker']['time_format'] == '12h')?'%h:%i%p':'%H:%i';
@@ -318,7 +383,160 @@ class EventManager{
         }
         $time = $res->fetch(PDO::FETCH_ASSOC);
         return $time;
+    }
 
+    /*
+     * Update single or recurring events using data from event details form.
+     */
+    public function updateEvent($data){
+        if(!$data['employee_id']){$data['employee_id'] = 0;}
 
+        $db = BoardroomBooker::getDB();
+
+        if($data['all_occurrences'] || !$data['was_recurring']){
+            /* Get a day and a year for events to create DataTime objects.
+             * It is necessary for checking new time slots of events.
+             * Events should not be changed if their new time slots overlaps with the time of any other event.
+             */
+            $query = "SELECT id, start_time, end_time FROM times WHERE event_id=:event_id";
+            $stmt = $db->prepare($query);
+
+            $res = $stmt->execute(array('event_id' => $data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+
+            $intervals_str = $stmt->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP );
+            $intervals_obj = array();
+            foreach($intervals_str as $k => $interval){
+                $intervals_obj[$k]['start'] = new DateTime($interval[0]['start_time']);
+                $intervals_obj[$k]['end'] = new DateTime($interval[0]['end_time']);
+
+            }
+
+            /* Set a new time for each time object and check it*/
+            $new_start_time = $this->get24hTime($data['start_time']);
+            $new_end_time = $this->get24hTime($data['end_time']);
+            if(!$new_start_time || !$new_end_time){
+                $this->errors[] = "Incorrect event time";
+                return false;
+            }
+            foreach($intervals_obj as $id => $time_arr){
+                $time_arr['start']->setTime($new_start_time['h'], $new_start_time['m']);
+                $time_arr['end']->setTime($new_end_time['h'], $new_end_time['m']);
+                $res = $this->checkIsTimeAvailable($time_arr, $id);
+                if($res>0 || $res === false){
+                    $this->errors[] = 'Specified event time overlaps with another event'.'<br>['.$this->getStringInterval($time_arr).']';
+                }
+
+            }
+            if($this->errors){return false;}
+
+            /* An 'execute' method didn't recognize parameter markers ':start_time' and ':end_time'
+             * so I insert the values directly.
+             */
+            $st = $new_start_time['h'].':'.$new_start_time['m'];
+            $et = $new_end_time['h'].':'.$new_end_time['m'];
+            $query = "UPDATE times
+                           SET start_time=DATE_FORMAT(start_time, '%Y-%m-%d {$st}'),
+                               end_time=DATE_FORMAT(end_time, '%Y-%m-%d {$et}')
+                           WHERE event_id=:event_id";
+            $stmp = $db->prepare($query);
+
+            $res = $stmt->execute(array('event_id' => $data['event_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+            //------------------
+            $query = "UPDATE events SET employee_id=:employee_id, specifics=:specifics WHERE id=:event_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array(
+                    'employee_id' => $data['employee_id'],
+                    'specifics' => $data['specifics'],
+                    'event_id'=> $data['event_id']
+            ));
+            if(!$this->checkRes($res, $stmt)){return false;}
+        }else{
+            /*Check if the new time is available*/
+            $query = "SELECT id, start_time, end_time FROM times WHERE id=:time_id";
+            $stmt = $db->prepare($query);
+
+            $res = $stmt->execute(array('time_id' => $data['times_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+
+            $intervals_str = $stmt->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP );
+
+            $intervals_obj = array();
+            foreach($intervals_str as $k => $interval){
+                $intervals_obj[$k]['start'] = new DateTime($interval[0]['start_time']);
+                $intervals_obj[$k]['end'] = new DateTime($interval[0]['end_time']);
+
+            }
+            /* Set a new time for each time object and check it*/
+            $new_start_time = $this->get24hTime($data['start_time']);
+            $new_end_time = $this->get24hTime($data['end_time']);
+            if(!$new_start_time || !$new_end_time){
+                $this->errors[] = "Incorrect event time";
+                return false;
+            }
+            foreach($intervals_obj as $id => $time_arr){
+                $time_arr['start']->setTime($new_start_time['h'], $new_start_time['m']);
+                $time_arr['end']->setTime($new_end_time['h'], $new_end_time['m']);
+                $res = $this->checkIsTimeAvailable($time_arr, $id);
+                if($res>0 || $res === false){
+                    $this->errors[] = 'Specified event time overlaps with another event'.'<br>['.$this->getStringInterval($time_arr).']';
+                }
+
+            }
+            if($this->errors){return false;}
+            //-------------------
+            $query = "INSERT INTO events (recurring, employee_id, specifics) VALUES ( 0, :employee_id, :specifics)";
+            $stmp = $db->prepare($query);
+
+            $res = $stmt->execute(array('employee_id' => $data['employee_id'], 'specifics' => $data['specifics']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+
+            $id = $db->lastInsertId();
+            //------------------
+            $query = "UPDATE times
+                           SET start_time=DATE_FORMAT(start_time, '%Y-%m-%d {$data['start_time']}'),
+                               end_time=DATE_FORMAT(end_time, '%Y-%m-%d {$data['end_time']}'),
+                               event_id=$id
+                           WHERE id=:times_id";
+            $stmt = $db->prepare($query);
+            $res = $stmt->execute(array('times_id' => $data['times_id']));
+            if(!$this->checkRes($res, $stmt)){return false;}
+        }
+        return true;
+    }
+
+    /*
+     * Check correctness of input time string.
+     * Convert time to 24 hours format.
+     *
+     * Returns array to use in DateTime->setTime().
+     */
+    function get24hTime($time_str){
+        $stamp = strtotime($time_str);
+        if(!$stamp){
+            return false;
+        }
+        return array('h'=>date("H", $stamp), 'm'=>date("i", $stamp));
+    }
+
+    function deleteEvent($data){
+        if($data['all_occurrences'] || !$data['was_recurring']){
+            $query = "DELETE FROM events WHERE id=:event_id";
+            $query = "DELETE FROM times WHERE event_id=:event_id";
+        }else{
+            $query = "SELECT COUNT(*) FROM times WHERE id=:event_id";
+            $query = "DELETE FROM times WHERE id=:event_id";
+            if($count < 2){
+                $query = "DELETE FROM events WHERE id=:event_id";
+            }
+        }
+    }
+    function checkRes($res, $stmt){
+        if(!$res){
+            $this->errors[] = $stmt->errorInfo()[2];
+            return false;
+        }
+        return true;
     }
 }

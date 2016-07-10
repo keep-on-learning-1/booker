@@ -6,26 +6,23 @@ class AjaxController{
     }
 
     public function getCalendarData(){
-        //var_dump($_POST); die;
         $month = $_POST['month'];
         $year = $_POST['year'];
 
-        /*if(!$_POST['month'] || !$_POST['year'] ){
-            $date = new DateTime();
-            $month = $date->format('m');
-            $year = $date->format('Y');
-        }else{
-            $month = $_POST['month'];
-            $year = $_POST['year'];
-        }*/
         require_once("./classes/event_manager.php");
         $data = EventManager::getTimeIntervals($month, $year);
         die(json_encode($data));
     }
 
     public function updateEvent(){
-        die(json_encode(array('result' => true, 'cause' => 'aaaaaa')));
-        var_dump($_POST);
+        require_once("./classes/event_manager.php");
+        $event_manager = new EventManager();
+
+        if(!$event_manager->updateEvent($_POST)){
+            $arr = array('result' => false, 'cause' => $event_manager->getErrors());
+            die(json_encode($arr));
+        }
+        die(json_encode(array('result' => true, 'cause' => '')));
     }
 
     public function __call($name, $args){

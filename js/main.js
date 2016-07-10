@@ -2,8 +2,14 @@ var external_controller_link;
 function refresh_table(){
     external_controller_link.refresh();
 }
-function display_message(message){
-    console.log(message);
+function display_message(message, msg_class){
+    var containner = document.getElementById('app_messages_container');
+    var str = [
+        '<div id="app_messages_container">',
+        '<div class="app_message '+ msg_class +'">' + message + "</div><br>",
+        '</div>'
+    ];
+    containner.innerHTML = containner.innerHTML + str.join("\r\n");
 }
 
 window.onload = function(){
