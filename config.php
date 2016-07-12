@@ -6,9 +6,8 @@ if(!$_COOKIE['setup_database_csrf'] || !$_POST['token'] || $_POST['token'] != $_
 }
 if( !$_POST['host']          ||
     !$_POST['db_user']       ||
-    !$_POST['db_name']       ||
-    //!$_POST['db_password']   ||
-    !$_POST['prefix'] )
+    //!$_POST['db_password'] ||
+    !$_POST['db_name'])
 {
     die('Required data are missed');
 }
@@ -27,7 +26,6 @@ $file = array(
     'db_host = '.$_POST['host'],
     'db_user = '.$_POST['db_user'],
     'db_password = '.$_POST['db_password'],
-    'db_prefix = '.$_POST['prefix']
 );
 $result = file_put_contents('booker.conf', implode("\r\n", $file)."\r\n");
 if(!$result){ throw new Exception('Can\'t write configuration file');}

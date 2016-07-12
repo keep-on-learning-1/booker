@@ -9,12 +9,12 @@ class AjaxController{
         $month = $_POST['month'];
         $year = $_POST['year'];
 
-        $data = EventManager::getTimeIntervals($month, $year);
+        $data = EventModel::getTimeIntervals($month, $year);
         die(json_encode($data));
     }
 
     public function updateEvent(){
-        $event_manager = new EventManager();
+        $event_manager = new EventModel();
 
         if(!$event_manager->updateEvent($_POST)){
             $arr = array('result' => false, 'cause' => $event_manager->getErrors());
@@ -24,7 +24,7 @@ class AjaxController{
     }
 
     public function deleteEvent(){
-        $event_manager = new EventManager();
+        $event_manager = new EventModel();
 
         if(!$event_manager->deleteEvent($_POST)){
             $arr = array('result' => false, 'cause' => $event_manager->getErrors());

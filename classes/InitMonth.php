@@ -66,7 +66,7 @@ class InitMonth{
 	}
 
 	/*
-	 * Method returns null or date for cells of calendar.
+	 * Method returns null or date for current cell of calendar.
 	 */
 	public function get_the_day(){
 		if($this->first_week_offset_countdown-- > 0 ){return;}
@@ -76,7 +76,7 @@ class InitMonth{
 
 	/*
 	 * TODO: delete
-	 * Provides posibility to set russian names of days for calendar
+	 * Provides possibility to set russian names of days for calendar
 	 */
 	function setDaysOfWeek($days){
 		if(!is_array($days) || count($days) != 7){

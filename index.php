@@ -6,7 +6,7 @@ Autoloader::getInstance()->registerLoaders();
 
 $booker = BoardroomBooker::getInstance();
 $booker->init();
-$booker->invokePage();
+//$booker->invokePage();
 
 //TODO: remove helpers
 function dd($i){

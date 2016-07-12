@@ -19,7 +19,7 @@
  *  - get24hTime
  *  - deleteEvent
  */
-class EventManager{
+class EventModel{
     private $errors;
     private $config;
     private $start_time;
@@ -588,5 +588,9 @@ class EventManager{
             return false;
         }
         return true;
+    }
+
+    public static function getMonthNames(){
+        return array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec');
     }
 }

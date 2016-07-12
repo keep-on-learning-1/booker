@@ -9,7 +9,7 @@
  *   - getById
  */
 
-class EmployeeManager{
+class EmployeeModel{
     private $errors;
     public function __construct(){
 

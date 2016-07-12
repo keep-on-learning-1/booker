@@ -1,9 +1,9 @@
 <?php
 /*
  * 	Methods:
- * 		getInstance - получение экземпляра объекта
- * 		init 		- инициализация объекта. Определяет какая страница будет отображена
- * 		invokePage 	- получение объекта Page. Получение html кода, который будет отображен.
+ * 		getInstance - get an instanec
+ * 		init 		- initialization
+ * 		invokePage 	- get HTML to display
  *
  * 		setPage
  * 		setPageData
@@ -12,9 +12,6 @@
  * 		getMessage
  * 		getDB
  * 		getConfig
- *
- * Метод init при вызове проверяет создн ли файл booker.conf. Если файла не существует - предполагается, что
- * это первый запуск приложения и, по очереди, будут отображены страницы setup_database и setup_booker.
  *
  */
 class BoardroomBooker{
@@ -37,8 +34,9 @@ class BoardroomBooker{
 	public function init(){
 		/*Check configuration*/
 		if(!file_exists('booker.conf')){
-			$this->page = 'setupDatabase';
-			return;
+			$controller = new CommandController($this);
+			$controller->setupDatabase();
+			die;
 		}
 		$config = parse_ini_file('booker.conf', 1);
 		if(!$config){throw new Exception('Can\'t read configuration file');}
@@ -48,33 +46,34 @@ class BoardroomBooker{
 			!$config['database']['db_user']
 		){
 			/*Did not found one or more options*/
-			$this->page = 'setupDatabase';
-			return;
+			$controller = new CommandController($this);
+			$controller->setupDatabase();
+			die;
 		}
 		self::$config = $config;
 
 		/* --Attempt to connect to database*/
 		$db = self::getDB();
-		if(!$db){
+/*		if(!$db){
 			$this->page = 'error';
 			return;
-		}
+		}*/
 
 		$res = $db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_ASSOC);
 		if($res['count'] == 0){
-			$this->page = 'setupBooker';
-			return;
+			$controller = new CommandController($this);
+			$controller->setupBooker();
+			die;
 		}
 
 		parse_str($_SERVER['QUERY_STRING'], $variables);
 		$method_name = ($variables['action'])?$variables['action']:'index';
-
 		/*Authorization*/
 		if(!$_SESSION['user'] && $method_name != 'login' ){
-			$this->page = 'signIn';
-			return;
+			$controller = new CommandController($this);
+			$controller->login();
+			die;
 		}
-
 		/*Handle AJAX request*/
 		if($method_name=='ajax'){
 			$ajax = new AjaxController();
@@ -84,19 +83,16 @@ class BoardroomBooker{
 
 		/*Main or target page*/
 		$controller = new CommandController($this);
-		if(!$controller->$method_name()){$controller->main();}
+		$controller->$method_name();
+		//if(!$controller->$method_name()){$controller->main();}
 
 		if(!$this->page){$this->page = 'mainPage';}
 	}
 
 	public function invokePage(){
-		//$file = './classes/pages/' . $this->page . '.php';
-		//if(file_exists($file)){
-		//	include_once $file;
-			$class_name = ucfirst($this->page);
-			$page_object = new $class_name($this->pageData);
-			$page_object->render();
-		//}
+			//$class_name = ucfirst($this->page);
+			//$page_object = new $class_name($this->pageData);
+			//$page_object->render();
 	}
 
 	public static function setMessage($msg, $class=''){
@@ -138,5 +134,18 @@ class BoardroomBooker{
 	}
 	public function setPageData($data){
 		$this->pageData = $data;
+	}
+
+	public static function getRenderedMessages(){
+		$messages = self::$messages;
+		$msg_html = array();
+		if(isset($messages) && is_array($messages)){
+			$msg_html[] = '<div id="app_messages_container">';
+			foreach($messages as $msg){
+				$msg_html[] = "<div class=\"app_message {$msg['class']}\">{$msg['text']}</div><br>";
+			}
+			$msg_html[] = '</div>';
+		}
+		return implode("\r\n", $msg_html);
 	}
 }
