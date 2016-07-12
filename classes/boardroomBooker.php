@@ -45,20 +45,21 @@ class BoardroomBooker{
 		/* --Check options*/
 		if(	!$config['database']['db_name'] ||
 			!$config['database']['db_host'] ||
-			!$config['database']['db_user'] ||
-			!$config['database']['db_prefix']
+			!$config['database']['db_user']
 		){
 			/*Did not found one or more options*/
 			$this->page = 'setupDatabase';
 			return;
 		}
 		self::$config = $config;
+
 		/* --Attempt to connect to database*/
 		$db = self::getDB();
 		if(!$db){
 			$this->page = 'error';
 			return;
 		}
+
 		$res = $db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_ASSOC);
 		if($res['count'] == 0){
 			$this->page = 'setupBooker';
@@ -76,7 +77,6 @@ class BoardroomBooker{
 
 		/*Handle AJAX request*/
 		if($method_name=='ajax'){
-			include_once './classes/ajax_controller.php';
 			$ajax = new AjaxController();
 			$ajax->$variables['m']();
 			die;
@@ -90,14 +90,13 @@ class BoardroomBooker{
 	}
 
 	public function invokePage(){
-		$file = './classes/pages/' . $this->page . '.php';
-		if(file_exists($file)){
-			include_once './classes/pages/page_pattern.php';
-			include_once $file;
+		//$file = './classes/pages/' . $this->page . '.php';
+		//if(file_exists($file)){
+		//	include_once $file;
 			$class_name = ucfirst($this->page);
 			$page_object = new $class_name($this->pageData);
 			$page_object->render();
-		}
+		//}
 	}
 
 	public static function setMessage($msg, $class=''){

@@ -2,20 +2,18 @@
 
 class AjaxController{
     public function __construct(){
-        require_once('./classes/booker.php');
+        require_once('./classes/autoloader.php');
     }
 
     public function getCalendarData(){
         $month = $_POST['month'];
         $year = $_POST['year'];
 
-        require_once("./classes/event_manager.php");
         $data = EventManager::getTimeIntervals($month, $year);
         die(json_encode($data));
     }
 
     public function updateEvent(){
-        require_once("./classes/event_manager.php");
         $event_manager = new EventManager();
 
         if(!$event_manager->updateEvent($_POST)){
@@ -26,7 +24,6 @@ class AjaxController{
     }
 
     public function deleteEvent(){
-        require_once("./classes/event_manager.php");
         $event_manager = new EventManager();
 
         if(!$event_manager->deleteEvent($_POST)){

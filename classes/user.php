@@ -30,4 +30,6 @@ class User{
     public static function logout(){
         unset($_SESSION['user']);
     }
+
+    public static function hasUsers(){}
 }

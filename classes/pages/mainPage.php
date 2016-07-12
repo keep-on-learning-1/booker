@@ -9,11 +9,8 @@ class MainPage extends PagePattern {
 
         $this->number_of_bookers = $this->config['booker']['number_of_bookers'];
         if(!(int)$this->number_of_bookers){$this->number_of_bookers = 3;}
-        require_once('./classes/InitMonth.php');
-        require_once('./classes/event_manager.php');
 		$first_day = $this->config['booker']['first_day'];
         $this->month = new InitMonth($first_day);
-		//dd($this->month);
 		$this->events = EventManager::getTimeIntervals($this->month->this_month, $this->month->this_year);
     }
 

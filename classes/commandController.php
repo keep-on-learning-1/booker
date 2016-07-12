@@ -19,15 +19,7 @@ class CommandController{
     public function __construct($booker){
         $this->booker = $booker;
     }
-    /*
-    public function index(){
-        $this->booker->setPage('mainPage');
-        return true;
-    }
-    */
     public function main(){
-        //include_once('./classes/event_manager.php');
-        //EventManager::getTimeIntervals(7, 2016);
         $this->booker->setPage('mainPage');
         return true;
     }
@@ -40,7 +32,6 @@ class CommandController{
         return true;
     }
     public function add_employee(){
-        require_once('./classes/employee_manager.php');
         $employee_manager = new EmployeeManager();
         if(!$employee_manager->validateEmployeeData($_POST)){
             $errors = $employee_manager->getErrors();
@@ -75,8 +66,6 @@ class CommandController{
         if(!isset($vars['id']) || !is_numeric($vars['id'])){
             return true;
         }
-
-        require_once('./classes/employee_manager.php');
         $employee_manager = new EmployeeManager();
 
         if(!$employee = $employee_manager->deleteEmployee($vars['id'])){
@@ -100,7 +89,6 @@ class CommandController{
             return true;
         }
 
-        require_once('./classes/employee_manager.php');
         $employee_manager = new EmployeeManager();
         if(!$employee = $employee_manager->getById($vars['id'])){
             $errors = $employee_manager->getErrors();
@@ -126,7 +114,6 @@ class CommandController{
             return true;
         }
 
-        require_once('./classes/employee_manager.php');
         $employee_manager = new EmployeeManager();
 
         if(!$old_employee = $employee_manager->getById($vars['id'])){
@@ -170,7 +157,6 @@ class CommandController{
 
     public function create_event(){
         $this->booker->setPage('bookIt');
-        require_once('./classes/event_manager.php');
         $event_manager = new EventManager();
         if(!$event_manager->createEvent($_POST)){
             $errors = $event_manager->getErrors();

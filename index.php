@@ -1,8 +1,9 @@
 <?php
 session_start();
-require_once('/classes/booker.php');
-require_once('/classes/user.php');
-require_once('/classes/commandController.php');
+
+require_once('./classes/autoloader.php');
+Autoloader::getInstance()->registerLoaders();
+
 $booker = BoardroomBooker::getInstance();
 $booker->init();
 $booker->invokePage();

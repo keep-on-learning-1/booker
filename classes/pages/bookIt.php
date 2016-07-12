@@ -10,7 +10,6 @@ class BookIt extends PagePattern{
         $this->months = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec');
         $this->config = BoardroomBooker::getConfig();
         $this->year = date('Y');
-        require_once('./classes/employee_manager.php');
         $this->employees_list = EmployeeManager::getEmployeeList();
         if(!is_array($this->employees_list)){ $this->employees_list = array();}
     }

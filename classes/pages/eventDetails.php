@@ -4,10 +4,6 @@ class EventDetails extends PagePattern {
     private $employees_list;
 
     public function __construct($id){
-        require_once('./classes/event_manager.php');
-        require_once('./classes/employee_manager.php');
-        $this->event = EventManager::getById($id);
-        //dd( $this->event);
         $this->employees_list = EmployeeManager::getEmployeeList();
     }
 
