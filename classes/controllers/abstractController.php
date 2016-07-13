@@ -1,9 +1,9 @@
 <?php
-abstract class abstractController{
+abstract class AbstractController{
     private $js_stack;
     private $css_stack;
     private $pageTemplate = 'mainTemplate.php';
-    private $defaultViewPath = './classes/views/';
+    protected $defaultViewPath;
 
     public function render($files, $data){
         if(isset($data) && is_array($data)){

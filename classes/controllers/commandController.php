@@ -14,11 +14,15 @@
  *  - logout
  *  - __call
  */
-class CommandController extends abstractController{
+class CommandController extends AbstractController{
     private $booker;
+    protected $defaultViewPath;
+
     public function __construct($booker){
         $this->booker = $booker;
+        $this->defaultViewPath = BASE_PATH.'classes/views/';
     }
+
     public function main(){
 
         $config = BoardroomBooker::getConfig();

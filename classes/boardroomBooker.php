@@ -3,7 +3,6 @@
  * 	Methods:
  * 		getInstance - get an instanec
  * 		init 		- initialization
- * 		invokePage 	- get HTML to display
  *
  * 		setPage
  * 		setPageData
@@ -34,7 +33,7 @@ class BoardroomBooker{
 	public function init(){
 		/*Check configuration*/
 		if(!file_exists('booker.conf')){
-			$controller = new CommandController($this);
+			$controller = new Configurer();
 			$controller->setupDatabase();
 			die;
 		}
@@ -46,7 +45,7 @@ class BoardroomBooker{
 			!$config['database']['db_user']
 		){
 			/*Did not found one or more options*/
-			$controller = new CommandController($this);
+			$controller = new Configurer($this);
 			$controller->setupDatabase();
 			die;
 		}
@@ -61,7 +60,7 @@ class BoardroomBooker{
 
 		$res = $db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_ASSOC);
 		if($res['count'] == 0){
-			$controller = new CommandController($this);
+			$controller = new Configurer($this);
 			$controller->setupBooker();
 			die;
 		}
@@ -87,12 +86,6 @@ class BoardroomBooker{
 		//if(!$controller->$method_name()){$controller->main();}
 
 		if(!$this->page){$this->page = 'mainPage';}
-	}
-
-	public function invokePage(){
-			//$class_name = ucfirst($this->page);
-			//$page_object = new $class_name($this->pageData);
-			//$page_object->render();
 	}
 
 	public static function setMessage($msg, $class=''){
@@ -147,5 +140,11 @@ class BoardroomBooker{
 			$msg_html[] = '</div>';
 		}
 		return implode("\r\n", $msg_html);
+	}
+
+	public static function setDefferedMessage($message){
+		$index = count($_SESSION['deffered_messages']);
+		$_SESSION['deffered_messages'][$index]['countdown'] = 1;
+		$_SESSION['deffered_messages'][$index]['message'] = $message;
 	}
 }

@@ -2,7 +2,7 @@
     <h1>Configuration of BoardroomBooker</h1>
 </div>
 <div class="default_form_container">
-    <form id="bb_config_form" action="createUser.php" method="POST">
+    <form id="bb_config_form" action="index.php?controller=configurer&action=setupBooker" method="POST">
         <input type="hidden" value="<?php echo $csrf; ?>" name="token">
         <h3>
             Create master user

@@ -1,6 +1,7 @@
 <?php
 /*
  * Methods:
+ *  Public
  *  - createEvent
  *  - getErrors
  *  - checkFields
@@ -72,9 +73,7 @@ class EventModel{
         return true;
     }
 
-    public function getErrors(){
-        return $this->errors;
-    }
+    public function getErrors(){return $this->errors;}
 
     /*
      * Method checks whether all of required fields were got from the form.
@@ -109,6 +108,9 @@ class EventModel{
         return true;
     }
 
+    /*
+     * Check correctness of the event time
+     */
     public function validateTime($time_arr){
         if(!is_array($time_arr)){
             $this->errors[] = "validateTime: Corrupted input data";
@@ -134,7 +136,7 @@ class EventModel{
      *  It will return true if objects are created, false otherwise.
      *  Puts created objects into appropriate protected properties.
      */
-    public function setTime($data){
+    private function setTime($data){
 
         $start_data_str =   ($data['event_month']+1).'-'.
             $data['event_day']      .'-'.
@@ -160,7 +162,7 @@ class EventModel{
         return true;
     }
 
-    public function getTime(){
+    private function getTime(){
         if(!$this->start_time || !$this->end_time){
             return false;
         }
@@ -183,7 +185,7 @@ class EventModel{
      *      ]
      *  )
      */
-    public function createEventTime($time_arr, $data){
+    private function createEventTime($time_arr, $data){
 
         if($data['is_recurred']){
             switch($data['recurrence']){
@@ -220,7 +222,7 @@ class EventModel{
      *      'end' => DateTime end
      *  )
      */
-    public function checkIsTimeAvailable($time_arr, $self_id = 0){
+    private function checkIsTimeAvailable($time_arr, $self_id = 0){
         if(!is_array($time_arr) || !$time_arr['start'] || !$time_arr['end']){
             $this->errors[] = 'checkIsTimeAvailable: Corrupted input data';
             return false;
@@ -253,7 +255,7 @@ class EventModel{
      *      'end' => DateTime end
      *  )
      */
-    function getStringInterval($time_arr){
+    private function getStringInterval($time_arr){
         if(!is_array($time_arr) || !$time_arr['start'] || !$time_arr['end']){
             $this->errors[] = 'getStringInterval: Corrupted input data';
             return false;
@@ -281,7 +283,7 @@ class EventModel{
      * Uses data from the event creation form.
      * Returns last insert id or false if error occurred.
      */
-    public function insertEventBody($data){
+    private function insertEventBody($data){
         $db = BoardroomBooker::getDB();
         $query = "INSERT INTO events (recurring, employee_id, specifics)
                   VALUES (:recurring, :employee_id, :specifics)";
@@ -301,7 +303,7 @@ class EventModel{
      * the start and the end of an event.
      * Returns true if row created or false if error occurred.
      */
-    public function insertEventTime($id, $intervals){
+    private function insertEventTime($id, $intervals){
         $db = BoardroomBooker::getDB();
 
         foreach($intervals as $key => $interval){
@@ -531,7 +533,7 @@ class EventModel{
      *
      * Returns array to use in DateTime->setTime().
      */
-    function get24hTime($time_str){
+    private function get24hTime($time_str){
         $stamp = strtotime($time_str);
         if(!$stamp){
             return false;
@@ -539,7 +541,7 @@ class EventModel{
         return array('h'=>date("H", $stamp), 'm'=>date("i", $stamp));
     }
 
-    function deleteEvent($data){
+    public function deleteEvent($data){
         $db = BoardroomBooker::getDB();
         if($data['all_occurrences'] || !$data['was_recurring']){
             $query = "DELETE FROM times WHERE event_id=:event_id";
@@ -582,7 +584,7 @@ class EventModel{
     /*
      * Check an error occurred during handling request to database
      */
-    function checkRes($res, $stmt){
+    private function checkRes($res, $stmt){
         if(!$res){
             $this->errors[] = $stmt->errorInfo()[2];
             return false;

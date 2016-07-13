@@ -2,7 +2,7 @@
     <h1>Configuration of BoardroomBooker</h1>
 </div>
 <div class="default_form_container">
-    <form id="db_config_form" action="config.php" method="POST">
+    <form id="db_config_form" action="index.php?controller=configurer&action=setupDatabase" method="POST">
         <input type="hidden" value="<?php echo $csrf; ?>" name="token">
         <h3>
             Configuration of database

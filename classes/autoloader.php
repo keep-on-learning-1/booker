@@ -18,23 +18,23 @@ class Autoloader{
     }
 
     public function loadClasses($className){
-        if(file_exists('./classes/'.lcfirst($className).'.php')){
-            include_once('./classes/'.lcfirst($className).'.php');
+        if(file_exists(BASE_PATH.'classes/'.lcfirst($className).'.php')){
+            include_once(BASE_PATH.'classes/'.lcfirst($className).'.php');
         }
     }
     public function loadClassesPages($className){
-        if(file_exists('./classes/pages/'.lcfirst($className).'.php')){
-            include_once('./classes/pages/'.lcfirst($className).'.php');
+        if(file_exists(BASE_PATH.'classes/pages/'.lcfirst($className).'.php')){
+            include_once(BASE_PATH.'classes/pages/'.lcfirst($className).'.php');
         }
     }
     public function loadModels($className){
-        if(file_exists('./classes/models/'.lcfirst($className).'.php')){
-            include_once('./classes/models/'.lcfirst($className).'.php');
+        if(file_exists(BASE_PATH.'classes/models/'.lcfirst($className).'.php')){
+            include_once(BASE_PATH.'classes/models/'.lcfirst($className).'.php');
         }
     }
     public function loadControllers($className){
-        if(file_exists('./classes/controllers/'.lcfirst($className).'.php')){
-            include_once('./classes/controllers/'.lcfirst($className).'.php');
+        if(file_exists(BASE_PATH.'classes/controllers/'.lcfirst($className).'.php')){
+            include_once(BASE_PATH.'classes/controllers/'.lcfirst($className).'.php');
         }
     }
 }

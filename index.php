@@ -1,20 +1,13 @@
 <?php
 session_start();
+define(BASE_PATH, __DIR__ . DIRECTORY_SEPARATOR);
 
 require_once('./classes/autoloader.php');
 Autoloader::getInstance()->registerLoaders();
 
+//$front = FrontController::getInstance();
+//$front->route();
+
 $booker = BoardroomBooker::getInstance();
 $booker->init();
-//$booker->invokePage();
 
-//TODO: remove helpers
-function dd($i){
-    var_dump($i); die;
-}
-function ed($i){
-    echo "<pre>";
-    var_export($i);
-    echo "</pre>";
-    die;
-}

@@ -25,10 +25,12 @@ class User{
         }
         $_SESSION['user'] = $user['login'];
         header("location: http://".$_SERVER['HTTP_HOST']);
-        return true;
+        die;
     }
     public static function logout(){
         unset($_SESSION['user']);
+        header("location: http://".$_SERVER['HTTP_HOST']);
+        die;
     }
 
     public static function hasUsers(){}
