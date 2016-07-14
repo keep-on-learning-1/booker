@@ -43,7 +43,7 @@
                 3.) Specify what the time and end of the meeting(This will be what people see on the calendar)
             </span>
             <br>
-            <?php if($config['booker']['time_format'] == '24h'):?>
+            <?php if($time_format == '24h'):?>
                 <select  value="admin" name="start_hours">
                     <?php for($i=1; $i<=24; $i++):?>
                         <option value="<?php echo $i;?>" ><?php echo $i;?></option>
@@ -66,7 +66,7 @@
                         <option value="<?php echo $i;?>" ><?php echo str_pad($i, 2, '0', STR_PAD_LEFT);?></option>
                     <?php endfor;?>
                 </select>
-            <?php elseif($config['booker']['time_format'] == '12h'):?>
+            <?php elseif($time_format == '12h'):?>
                 <select  value="admin" name="start_hours">
                     <?php for($i=1; $i<=12; $i++):?>
                         <option value="<?php echo $i;?>" ><?php echo $i;?></option>

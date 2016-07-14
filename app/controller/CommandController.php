@@ -10,8 +10,6 @@
  *  - edit_employee
  *  - book_it
  *  -
- *  - login
- *  - logout
  *  - __call
  */
 class CommandController extends MainController{
@@ -25,7 +23,6 @@ class CommandController extends MainController{
 
         $config = BoardroomBooker::getConfig();
 
-        $data['config'] = $config;
         $data['number_of_bookers'] = $this->getBookersCount();
         $data['first_day'] = ($config['booker']['first_day'])?$config['booker']['first_day']:'monday';
         $data['month'] = new InitMonth( $data['first_day'] );
@@ -163,9 +160,10 @@ class CommandController extends MainController{
     }
 
     public function book_it(){
-        $data['config'] = BoardroomBooker::getConfig();
+        $config = BoardroomBooker::getConfig();
         $data['number_of_bookers'] = $this->getBookersCount();
 
+        $data['time_format'] = $config['booker']['time_format'];
         $data['curr_page'] = 'Book It!';
         $data['months'] = EventModel::getMonthNames();
         $data['year'] = date('Y');
@@ -181,7 +179,9 @@ class CommandController extends MainController{
         $event_manager = new EventModel();
         if(!$event_manager->createEvent($_POST)){
             $this->setErrors( $event_manager->getErrors() );
-            $data['config'] = BoardroomBooker::getConfig();
+            $config = BoardroomBooker::getConfig();
+
+            $data['time_format'] = $config['booker']['time_format'];
             $data['number_of_bookers'] = $this->getBookersCount();
 
             $data['curr_page'] = 'Book It!';
@@ -196,7 +196,6 @@ class CommandController extends MainController{
         }
 
         $config = BoardroomBooker::getConfig();
-        $data['config'] = $config;
         $data['number_of_bookers'] = $this->getBookersCount();
         $data['first_day'] = ($config['booker']['first_day'])?$config['booker']['first_day']:'monday';
         $data['month'] = new InitMonth( $data['first_day'] );
@@ -223,15 +222,6 @@ class CommandController extends MainController{
 
         $this->render(array('eventDetails'), $data);
         return true;
-    }
-
-    public function login(){
-        if(!UserModel::login($_POST)){
-            $this->render('signIn', array());
-            die;
-        }
-        header("Location: http://".$_SERVER['HTTP_HOST'].'/index.php');
-        die;
     }
 
     public function error(){

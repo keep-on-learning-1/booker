@@ -9,11 +9,11 @@
 	<?php echo BoardroomBooker::getRenderedMessages()?>
 </div>
 
-<div id="calendar_container" data-first_day='<?php echo $config['booker']['first_day']?>'>
+<div id="calendar_container" data-first_day='<?php echo $first_day; ?>'>
 	<table id='bb_calendar'>
 		<thead>
 		<tr>
-			<?php foreach($month->getDaysOfWeek($config['booker']['first_day']) as $day_caption): ?>
+			<?php foreach($month->getDaysOfWeek($first_day) as $day_caption): ?>
 				<td>
 					<?php echo $day_caption; ?>
 				</td>

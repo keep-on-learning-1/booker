@@ -1,10 +1,31 @@
 <?php
+
+/*
+ * Methods
+ * Static
+ *  - login             - Log user in the application
+ *  - logout            - Log current user out of system
+ *  - getCount          - Return total number of users in database.
+ *  - getUser           - Return name of current user or false if no one is logged in.
+ *  - checkToken        - Compare given token with generated on user user creation page.
+ *
+ * Public
+ *  - validateFormInput -
+ *  - create            -
+ *  - getErrors         - Return an array of errors
+ */
 class UserModel{
     private $errors;
 
-    public function __construct(){
+    public function __construct(){}
 
-    }
+    /*
+     * Check given login and password. Log user in the application if they are correct.
+     * Store username into $_SESSION.
+     *
+     * input: array('login', 'password')
+     * return: boolean
+     */
     public static function login($data){
         if(!$data['login'] && !$data['password']){
             return false;
@@ -23,24 +44,39 @@ class UserModel{
             return false;
         }
         $_SESSION['user'] = $user['login'];
-        header("location: http://".$_SERVER['HTTP_HOST']);
-        die;
-    }
-    public static function logout(){
-        unset($_SESSION['user']);
-        header("location: http://".$_SERVER['HTTP_HOST']);
-        die;
+        return true;
     }
 
+    /*
+     *  Log current user out of system
+     */
+    public static function logout(){
+        unset($_SESSION['user']);
+        return true;
+    }
+
+    /*
+     * Return total number of users in database.
+     */
     public static function getCount(){
         $db = BoardroomBooker::getDB();
         return $db->query('SELECT COUNT(*) as count FROM users')->fetch(PDO::FETCH_COLUMN);
     }
 
+    /*
+     * Return name of current user or false if no one is logged in.
+     *
+     * return string $name|false
+     */
     public static function getUser(){
         return (isset($_SESSION['user']))?$_SESSION['user']:false;
     }
 
+    /*
+     * Compare given token with generated on user user creation page.
+     *
+     * return boolean
+     */
     public static function checkToken($data){
         if(!$_COOKIE['create_user_csrf'] || !$data['token'] || $data['token'] != $_COOKIE['create_user_csrf'] ){
             return false;
@@ -49,6 +85,13 @@ class UserModel{
         return true;
     }
 
+    /*
+     * Check correctness of form data
+     *
+     * input: array('login','password','confirm_password')
+     *
+     * return boolean
+     */
     public function validateFormInput($data){
         if( !$data['login'] || !$data['password'] || !$data['confirm_password']){
             $this->errors[] = ('Required data are missed');
@@ -73,6 +116,13 @@ class UserModel{
         return true;
     }
 
+    /*
+     * Create a record in 'users' table
+     *
+     * input: array('login','password')
+     *
+     * return boolean
+     */
     public function create($data){
         $db = BoardroomBooker::getDB();
 
@@ -86,7 +136,7 @@ class UserModel{
         return true;
 
     }
-    public function getErrores(){
+    public function getErrors(){
         if(!$this->errors){$this->errors = array();}
         return $this->errors;
     }

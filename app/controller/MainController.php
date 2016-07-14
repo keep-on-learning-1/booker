@@ -1,10 +1,41 @@
 <?php
-abstract class MainController{
+
+/*
+ * Methods
+ *  Public
+ *   - render
+ *   - registerCSS
+ *   - getCSS
+ *   - registerJS
+ *   - getJS
+ *   - includeView
+ *   - setErrors
+ *   - setTemplate
+ *   - getBookersCount
+ *   - setupBooker
+ *   - setupDatabase
+ *   - createUser
+ *   - login
+ *   - logout
+ */
+class MainController{
     private $js_stack;
     private $css_stack;
     private $pageTemplate = 'mainTemplate.php';
     protected $defaultViewPath;
 
+    /*
+     * Generates page html using view and, if specified, template files.
+     * Send generated html to output.
+     *
+     * Default template is 'mainTemplate' and it can be changed.
+     *
+     * input: array|string $files, array $data
+     *
+     *  $files - name or array of names of view files.
+     *  $data - array of variables used in views and template.
+     *
+     */
     public function render($files, $data){
         if(isset($data) && is_array($data)){
             extract($data);
@@ -74,11 +105,7 @@ abstract class MainController{
         return  ($bookers_number)?$bookers_number:3;
     }
 
-    public function logout(){
-        unset($_SESSION['user']);
-        header("Location: http://".$_SERVER['HTTP_HOST'].'/index.php');
-        die;
-    }
+
 
     public function setupBooker(){
         if(empty($_POST)){
@@ -158,5 +185,19 @@ abstract class MainController{
             header('Location: http://'.$_SERVER['HTTP_HOST']);
             die;
         }
+    }
+    public function login(){
+        if(!UserModel::login($_POST)){
+            $this->render('signIn', array());
+            die;
+        }
+        header("Location: http://".$_SERVER['HTTP_HOST'].'/index.php');
+        die;
+    }
+
+    public function logout(){
+        UserModel::logout();
+        header("Location: http://".$_SERVER['HTTP_HOST'].'/index.php');
+        die;
     }
 }

@@ -1,19 +1,27 @@
 <?php
 /*
  * Methods:
- *   - validateEmployeeData
- *   - getErrors
- *   - addEmployee
- *   - editEmployee
- *   - deleteEmployee
- *   - getById
+ *   - validateEmployeeData - validating form data
+ *   - getErrors            - returns array of errors
+ *   - addEmployee          - insert employee data into database
+ *   - editEmployee         - edit existing employee data
+ *   - deleteEmployee       - remove employee data from database
+ *   - getById              - find employee data using id and return them
  */
 
 class EmployeeModel{
     private $errors;
-    public function __construct(){
+    public function __construct(){}
 
-    }
+    /*
+     * Validating correctness of employee data obtained from form.
+     * input:
+     * array(
+     *    'name'  - employee name
+     *    'email' - employee email
+     *  )
+     * return: true|false
+     */
     public function validateEmployeeData($data){
         if(!is_array($data)){
             $this->errors[] = 'Wrong input data';
@@ -40,12 +48,18 @@ class EmployeeModel{
         return true;
     }
 
-    public function getErrors(){
-        return $this->errors;
-    }
+    public function getErrors(){return $this->errors;}
 
     /*
-     * Добавление пользователя. Предполагается, что проверка данных уже была выполнена
+     * Insert employee data into database
+     * Check if user with specified email already exists. Return false and set appropriate message if it is.
+     *
+     * input:
+     * array(
+     *    'name'  - employee name
+     *    'email' - employee email
+     *  )
+     * return: true|false
      */
     public function addEmployee($data){
 
@@ -72,6 +86,17 @@ class EmployeeModel{
         return true;
     }
 
+    /*
+     * Edit existed employee
+     * input:
+     * int $id - identity number in database of required employee record.
+     * array $data(
+     *    'name'  - employee name
+     *    'email' - employee email
+     *  )
+     * return: true|false
+     *
+     */
     public function editEmployee($id, $data){
         if(!$id || !is_numeric($id)){return false;}
         $db = BoardroomBooker::getDB();
@@ -84,6 +109,12 @@ class EmployeeModel{
         return true;
     }
 
+    /*
+     * Delete employee record from database
+     * int $id - identity number in database of required employee record.
+     *
+     * return: true|false
+     */
     public function deleteEmployee($id){
         if(!$id || !is_numeric($id)){return false;}
 
@@ -100,9 +131,13 @@ class EmployeeModel{
             $this->errors[] = $stmt->errorInfo()[2];
             return false;
         }
-        return $employee;
+        return true;
     }
 
+    /*
+     * int $id - identity number in database of required employee record.
+     * return false|array('id', 'name', 'email')
+     */
     public function getById($id){
         if(!$id || !is_numeric($id)){return false;}
 
@@ -122,6 +157,17 @@ class EmployeeModel{
         return $employee;
     }
 
+    /*
+     * Returns array of all existed employee records
+     * return false|array $employees_list
+     *
+     *  $employees_list = [
+     *      'id',
+     *      'name',
+     *      'email'
+     *  ]
+     *
+     */
     public static function getEmployeeList(){
         $db = BoardroomBooker::getDB();
         $res = $db->query('SELECT * FROM employees');

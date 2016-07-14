@@ -72,7 +72,7 @@ class FrontController{
 
         /* Check if user authorized*/
         if(!$_SESSION['user'] && $action_name != 'login' ){
-            $controller = new CommandController();
+            $controller = new MainController();
             $controller->login();
         }
 
