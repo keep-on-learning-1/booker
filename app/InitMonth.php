@@ -3,26 +3,25 @@
  * Class incapsulates all initial values for a first month that will be displayed on page after
  * its loading.
  * methods list:
- * 	- getInitialMonth
- *  - getDaysOfWeek
- *  - getWeeksInMonth
- *  - get_the_day
- *  - setDaysOfWeek
- *  - getDate
+ * 	- getInitialMonth	- Get current month and year as a string
+ *  - getDaysOfWeek		- Return shortened names of days
+ *  - getWeeksInMonth	- Get calculated number of weeks in specified month
+ *  - get_the_day		- Return current date. Using in loop.
+ *  - getDate			- Return DateTime object of first day of current month
  */
 
 class InitMonth{
 	private $days_of_week = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 	private $days_of_week_sun = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-	private $date;
-	private $days_in_month;
-	private $first_week_offset;
-	private $weeks_in_month;
-	private $first_week_offset_countdown;
-	private $days_counter;
+	private $date;							// DataTime object for the first day of current month
+	private $days_in_month;					// number of days in the month
+	private $first_week_offset;				// number of empty cells in calendar, used for countdown
+	private $weeks_in_month;				// number of weeks in the month
+	private $first_week_offset_countdown;	// number of empty cells in calendar table before the 1-st day of month
+	private $days_counter;					// counter that is used in the loop
 
-	public $this_month;
-	public $this_year;
+	public $this_month;						// current month, 1..12
+	public $this_year;						// current year
 
 	
 	public function __construct($first_day = 'monday'){
@@ -37,7 +36,7 @@ class InitMonth{
 		$this->weeks_in_month = ceil(($this->days_in_month + $this->first_week_offset) / 7);
 		$this->first_week_offset_countdown = $this->first_week_offset;
 
-		$this->this_month = (int)$this->date->format('m');
+		$this->this_month = (int)$this->date->format('n');
 		$this->this_year = (int)$this->date->format('Y');
 	}
 
@@ -72,17 +71,6 @@ class InitMonth{
 		if($this->first_week_offset_countdown-- > 0 ){return;}
 		if($this->days_counter > $this->days_in_month){return;}
 		return $this->days_counter++;
-	}
-
-	/*
-	 * TODO: delete
-	 * Provides possibility to set russian names of days for calendar
-	 */
-	function setDaysOfWeek($days){
-		if(!is_array($days) || count($days) != 7){
-			return false;
-		}
-		$this->days_of_week = $days;
 	}
 
 	/*

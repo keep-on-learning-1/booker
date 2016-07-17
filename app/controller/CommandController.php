@@ -31,7 +31,7 @@ class CommandController extends MainController{
         $data['curr_page'] = 'Boardroom 1';
 
         $this->registerJS('CalendarController.js');
-        $this->registerJS('bb_calendar.js');
+        $this->registerJS('BB_Calendar.js');
         $this->registerJS('main.js');
 
         $this->render(array('topSection','mainPage'), $data);
@@ -91,7 +91,9 @@ class CommandController extends MainController{
         //if(!isset($vars['id']) || !is_numeric($vars['id'])){return true;}
         $employee_manager = new EmployeeModel();
 
-        if(!$employee = $employee_manager->deleteEmployee($vars['id'])){
+        $employee = $employee_manager->getById($vars['id']);
+
+        if(!$employee_manager->deleteEmployee($vars['id'])){
             $this->setErrors( $employee_manager->getErrors() );
         }else{
             BoardroomBooker::setMessage("Employee {$employee['name']}({$employee['email']}) has been deleted from database");
@@ -204,7 +206,7 @@ class CommandController extends MainController{
         $data['curr_page'] = 'Boardroom 1';
 
         $this->registerJS('CalendarController.js');
-        $this->registerJS('bb_calendar.js');
+        $this->registerJS('BB_Calendar.js');
         $this->registerJS('main.js');
 
         // all informative messages was created inside the $event_manager->createEvent() method

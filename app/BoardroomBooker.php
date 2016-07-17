@@ -9,13 +9,14 @@
  * Stores link to database object and array of application settings.
  *
  * 	Methods:
- * 		getInstance - get an instance
- * 		init 		- initialization
- *
- * 		setMessage
- * 		getMessage
- * 		getDB
- * 		getConfig
+ * 	 - getInstance
+ * 	 - init					- Invoke FrontController->route and handle error if occurred.
+ * 	 - setMessage			- Put message in stack
+ * 	 - getMessages			- Get array of messages
+ * 	 - getDB				- Get instance of PDO class
+ * 	 - getConfig			- Get values from configuration file as an array
+ *   - getRenderedMessages  - Get rendered HTML for all messages
+ *   - getBaseURL			- Get absolute URL
  */
 class BoardroomBooker{
 	private static $instance;
@@ -43,6 +44,12 @@ class BoardroomBooker{
 		}
 	}
 
+	/*
+	 * Put a message into array of messages
+	 * input
+	 * 	 $msg - text ov the message
+	 * 	 $class - CSS class htat will be used during rendering
+	 */
 	public static function setMessage($msg, $class=''){
 		self::$messages[] = array('text'=>$msg, 'class'=>$class);
 	}
@@ -54,6 +61,11 @@ class BoardroomBooker{
 		return self::$messages;
 	}
 
+	/*
+	 * Get an instance of PDO
+	 *
+	 * return PDO $db|false
+	 */
 	public static function getDB(){
 		if(!self::$db){
 			$config =self::getConfig();
@@ -67,6 +79,12 @@ class BoardroomBooker{
 		}
 		return self::$db;
 	}
+
+	/*
+	 * Get an array of application options from configuration file
+	 *
+	 * return array $config|false
+	 */
 	public static function getConfig(){
 		if(!self::$config){
 			if(!file_exists('booker.conf')){
@@ -80,6 +98,11 @@ class BoardroomBooker{
 		return self::$config;
 	}
 
+	/*
+	 * Get html for informative messages that can be used in view files.
+	 *
+	 * return string
+	 */
 	public static function getRenderedMessages(){
 		$messages = self::$messages;
 		$msg_html = array();
@@ -93,11 +116,13 @@ class BoardroomBooker{
 		return implode("\r\n", $msg_html);
 	}
 
+	/*
 	public static function setDefferedMessage($message){
 		$index = count($_SESSION['deffered_messages']);
 		$_SESSION['deffered_messages'][$index]['countdown'] = 1;
 		$_SESSION['deffered_messages'][$index]['message'] = $message;
 	}
+	*/
 
 	public static function getBaseURL(){
 		if(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'){

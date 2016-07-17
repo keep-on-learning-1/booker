@@ -3,18 +3,20 @@
 /*
  * Methods
  *  Public
- *   - render
- *   - registerCSS
- *   - getCSS
- *   - registerJS
- *   - getJS
- *   - includeView
- *   - setErrors
- *   - setTemplate
- *   - getBookersCount
- *   - setupBooker
- *   - setupDatabase
- *   - createUser
+ *   - render           - Send generated html to output.
+ *   - registerCSS      - Add CSS file name into array $js_stack
+ *   - getCSS           - Get array of CSS files names or empty array
+ *   - registerJS       - Add JS file name into array $js_stack
+ *   - getJS            - Get array of JS files names or empty array
+ *   - includeView      - Get parsed HTML of specified view file.
+ *   - setErrors        - Use loop to invoke BoardroomBooker::setError() for each cell of input array.
+ *   - setTemplate      - Set template that should be used during page rendering
+ *   - getBookersCount  - Get number of bookers
+ *   - setupBooker      - Render a form to set application options. Write obtained values into configuration file.
+ *   - setupDatabase    - Render a form to set database access data. Write obtained values into configuration file.
+ *                        Generate required tables in specified database if they are not exist
+ *   - createUser       - Render a form to set login and password for new user.
+ *                        Create a new record for the application user in database.
  *   - login
  *   - logout
  */
@@ -22,7 +24,7 @@ class MainController{
     private $js_stack;
     private $css_stack;
     private $pageTemplate = 'mainTemplate.php';
-    protected $defaultViewPath;
+    protected $defaultViewPath='app/view/';
 
     /*
      * Generates page html using view and, if specified, template files.
@@ -40,7 +42,6 @@ class MainController{
         if(isset($data) && is_array($data)){
             extract($data);
         }
-
         if(!is_array($files)){$files = array($files);}
         foreach($files as $file){
             $content[] = $this->includeView($file, $data); //will be used in 'pageTemplate'
@@ -60,20 +61,21 @@ class MainController{
         }
     }
 
-    public function registerCSS($file){
-        $this->css_stack[] = $file;
-    }
-    public function getCSS(){
-        return ($this->css_stack)?$this->css_stack:array();
-    }
+    public function registerCSS($file){$this->css_stack[] = $file;}
+    public function getCSS(){return ($this->css_stack)?$this->css_stack:array();}
 
-    public function registerJS($file){
-        $this->js_stack[] = $file;
-    }
-    public function getJS(){
-        return ($this->js_stack)?$this->js_stack:array();
-    }
+    public function registerJS($file){$this->js_stack[] = $file;}
+    public function getJS(){return ($this->js_stack)?$this->js_stack:array();}
 
+    /*
+     * Get parsed HTML of specified view file.
+     * input:
+     *  string $file - view file name
+     *  array $data - array of variables that are used in code of view file
+     *
+     * return:
+     *  string $content
+     */
     public function includeView($file, $data){
         $path = $this->defaultViewPath.$file.'.php';
         $content = '';
@@ -86,9 +88,14 @@ class MainController{
         return $content;
     }
 
+    /*
+     * Set template that should be used during page rendering
+     * input: string $template_filename - name of template file
+     */
     public function setTemplate($template_filename){
         $this->pageTemplate = $template_filename;
     }
+
 
     protected function setErrors($errors){
         if(!is_array($errors)){
@@ -99,6 +106,12 @@ class MainController{
         }
     }
 
+    /*
+     * Use configuration file to get number of boardrooms
+     * Use 3 by default if no value was set
+     *
+     * reutn int $bookers_number;
+     */
     protected function getBookersCount(){
         $config = BoardroomBooker::getConfig();
         $bookers_number = (int)$config['booker']['number_of_bookers'];
@@ -106,7 +119,12 @@ class MainController{
     }
 
 
-
+    /*
+     * Render form to set BoardroomBooker options.
+     * Generate CSRF protection random string that will be added to form data and checked by form data handler.
+     * If there were data sent by POST, validate them and try to write into configuration file.
+     *
+     */
     public function setupBooker(){
         if(empty($_POST)){
             $data['csrf'] = sha1(rand(0, PHP_INT_MAX));
@@ -129,6 +147,11 @@ class MainController{
         }
     }
 
+    /*
+     * Render form to set database connection credentials.
+     * Generate CSRF protection random string that will be added to form data and checked by form data handler.
+     * If there were data sent by POST, validate them and try to write into configuration file.
+     */
     public function setupDatabase(){
         if(empty($_POST)) {
             if (file_exists('booker.conf') && !UserModel::getUser()) {
@@ -153,6 +176,10 @@ class MainController{
         }
     }
 
+    /*
+     * Generate a form to create a new application user
+     * Handle form data to create a record in database.
+     */
     public function createUser(){
         if(empty($_POST)){
             $data['csrf'] = sha1(rand(0, PHP_INT_MAX));

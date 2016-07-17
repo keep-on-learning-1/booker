@@ -1,7 +1,9 @@
 var external_controller_link;
+
 function refresh_table(){
     external_controller_link.refresh();
 }
+
 function display_message(message, msg_class){
     var containner = document.getElementById('app_messages_container');
     var str = [
@@ -18,13 +20,13 @@ window.onload = function(){
     external_controller_link = calendarController_instance;
 
     var calendar_container = document.getElementById('calendar_container');
-    var calendar_instance = new bb_calendar(calendar_container, calendarController_instance)
+    var calendar_instance = new BB_Calendar(calendar_container, calendarController_instance)
 
     /* Event handler */
     document.addEventListener('month_change', function(event){
         var calendars_list = document.getElementsByClassName('bb_calendar');
         for(var i=0;i<calendars_list.length;i++){
-            var current_calendar = calendars_list[i].dm_calendar;
+            var current_calendar = calendars_list[i].bb_calendar;
             if(current_calendar.depends_of(event)){
                 //console.log(event.year, event.month);
                 requestMonth(event.year, event.month, current_calendar);

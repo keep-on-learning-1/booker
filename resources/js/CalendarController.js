@@ -1,3 +1,25 @@
+/*
+ * Controller for BB_Calendar
+ *
+ *  Constructor accepts a link to container element (DIV element) and an object of options
+ *  	options = {
+ *  				captionLeft: '<',
+ *  				captionLeftClass: 'CalendarControl_button-left',
+ *  				captionRight: '>',
+ *  				captionRightClass: 'CalendarControl_button-right',
+ *  				captionMonthClass: 'CalendarControl_month-caption'
+ *  			  }
+ *  Inside the container element generated 2 control elements and a field to display current month(and year).
+ *  CSS classes that were specified in options object of constructor will be added to created elements.
+ *
+ *  When mouse click occurred on control element an 'month_change' event is generated.
+ *  An event object has 2 additional properties:
+ *  	- event.month - number of a new month (0..11)
+ *  	- event.year - a year, 4 digits
+ *
+ *  Has refresh() method to invoke once again the current displaying month to refresh calendar table.
+ */
+
 function CalendarController(container, options){
 	var monthes = [
 		"January",
@@ -33,7 +55,7 @@ function CalendarController(container, options){
 	inner_options.captionRight = options.captionLeft || '>'
 	inner_options.captionRightClass = options.captionRightClass || "CalendarControl_button-right"
 	
-	inner_options.captionMonthClass = options.captionRightClass || "CalendarControl_month-caption"
+	inner_options.captionMonthClass = options.captionMonthClass || "CalendarControl_month-caption"
 	
 	this.date = new Date();
 	
@@ -50,7 +72,7 @@ function CalendarController(container, options){
 	right.innerHTML = inner_options.captionRight;
 	caption.innerHTML = monthes[this.date.getMonth()] + " " + this.date.getFullYear()
 	//caption.innerHTML = this.date.toLocaleString('en', {month: 'long', year: 'numeric'});
-	
+
 	//Events on controls
 	var self = this;
 

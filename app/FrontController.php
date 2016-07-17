@@ -1,4 +1,5 @@
 <?php
+
 class FrontController{
     private static $instance;
     private function __construct(){}

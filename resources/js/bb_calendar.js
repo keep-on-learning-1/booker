@@ -1,45 +1,46 @@
 /**
-*  ласс календар€. (IE 9+)
-* ¬ качестве аргументов конструктор принимает ссылки на контейнер(элемент DIV) и 
-* экземпл€р объекта CaltndarController.
-* ѕри создании экземпл€ра объекта контейнеру добавл€етс€ css класс "DM_calendar"
-* —сылка на экземпл€р класса хрнитс€ в свойстве DM_calendar элемента-контейнера
-*
-* ѕри смене мес€ца CaltndarController генерирует событие month_change.
-* Ёто событие имеет 2 свойства: month и year.
-* —обытие вызываетс€ на элементе-контейнере. »менно он будет в event.target
-*
-* ѕубличные методы:
-* 	- depends_of( event ) - провер€ет, было ли событие month_change вызвано на том же элементе, 
-*	  который был передан в качестве controllert текущему экземпл€ру класса.
-*	- change_month( year, months ) - изменение содержимого container в соответствии с заданными
-*	  годом и мес€цем.
-*	  ѕри построении таблицы дл€ каждой €чейки вызываетс€ приватный метод dayRenderer. Ётот метод 
-* 	  нужно переопределить дл€ заполнени€ €чеек HTML-контентом.
-*   - setDayRenderer - переопредел€ет метод dayRenderer, который вызываетс€ дл€ заполнени€
-*	  €чейки контентом.
-*
-* ƒл€ большей прозрачности обработчик month_change повешен на document.
-* ѕри возникновении month_change выбираютс€ все объекты DM_calendar и перебираютс€ в цикле.
-* ƒл€ тех из них, у которых элемент controller совпал с event.target, вызываетс€ метод 
-* change_month(year, month).
-*
-* 	methods:
- * 		-
+ * A class of calendar (IE 9+)
+ *
+ * Constructor accepts a link to container element (DIV element) and an instance of CaltndarController
+ * CSS class "bb_calendar" will be added to container.
+ * A link to a BB_Calendar instance is stored as 'bb_calendar' property of container element
+ *
+ * When the month is changed using CaltndarController an 'month_change' is generated.
+ * An event is triggered on CaltndarController container element so links to the same instance of
+ * CaltndarController will be stored in event.target and BB_Calendar.controller
+ * Event object has 2 additional properties: month and year.
+ *
+ * Methods
+ * 	- depends_of( event ) - check if the 'month_change' event was triggered on the
+ * 	  same element that was put as an argument 'controller' to BB_Calendar constructor
+ *	- change_month( year, months ) - Change the HTML of container to display specified month
+ *  - setData - set an object of data that will be used to create a calendar HTML when new month specified
+ *  	e.g.{
+ *  		"12":[
+ *  				{"start":"07:00am","end":"08:00am","event_id":"27","id":"40"}
+ *  			 ],
+ *  		"18":[
+ *  				{"start":"07:00am","end":"08:00am","event_id":"28","id":"43"},
+ *  				{"start":"07:00am","end":"08:00am","event_id":"29","id":"49"}
+ *  			 ],
+ *  		}
+ *  - getData - return an object of data
+ *
+ * Example of 'month_change' event handler:
  *
  * 	document.addEventListener('month_change', function(event){
-*		var calendars_list = document.getElementsByClassName('DM_calendar');
-*		for(var i=0;i<calendars_list.length;i++){
-*			var current_calendar = calendars_list[i].dm_calendar;
-*			if(current_calendar.depends_of(event)){
-*				current_calendar.change_month(event.year, event.month);
-*			}
-*		}
-*	});
-*
-*/
+ *		var calendars_list = document.getElementsByClassName('bb_calendar');
+ *		for(var i=0;i<calendars_list.length;i++){
+ *			var current_calendar = calendars_list[i].bb_calendar;
+ *			if(current_calendar.depends_of(event)){
+ *				current_calendar.change_month(event.year, event.month);
+ *			}
+ *		}
+ *	});
+ *
+ */
 
-function bb_calendar(container, controller, options){
+function BB_Calendar(container, controller, options){
 	this.controller = controller;
 	this.container = container;
 	
@@ -59,15 +60,11 @@ function bb_calendar(container, controller, options){
 		throw new Error('An instance of CalendarController has not been given to constructor');
 	};
 	container.classList.add('bb_calendar');
-	container.dm_calendar = this;
+	container.bb_calendar = this;
 	
 	/* Public methods*/
 	this.change_month = change_month;
 	this.depends_of = depends_of;
-	this.setDayRenderer = function(func){
-		if(typeof(func) != 'function'){return;}
-		dayRenderer = func; // global variable
-	};
 	this.setData = function($data){
 		data = $data; // global variable
 	}
